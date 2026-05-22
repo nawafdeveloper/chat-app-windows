@@ -1,0 +1,51 @@
+{
+  "name": "yahla-windows",
+  "version": "1.0.0",
+  "description": "Electron desktop app starter for Yahla on Windows.",
+  "main": "out/main/index.js",
+  "scripts": {
+    "dev": "electron-vite dev",
+    "start": "electron-vite dev",
+    "build": "npm run typecheck && electron-vite build",
+    "preview": "electron-vite preview",
+    "typecheck": "tsc -b",
+    "check": "npm run typecheck",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@swc/core": "^1.15.33",
+    "@tailwindcss/vite": "^4.3.0",
+    "@types/node": "^25.9.1",
+    "@types/react": "^19.2.15",
+    "@types/react-dom": "^19.2.3",
+    "@types/react-lazy-load-image-component": "^1.6.5",
+    "@vitejs/plugin-react": "^5.2.0",
+    "electron": "^42.2.0",
+    "electron-vite": "^5.0.0",
+    "tailwindcss": "^4.3.0",
+    "typescript": "^6.0.3",
+    "vite": "^7.3.3"
+  },
+  "dependencies": {
+    "@better-auth/electron": "^1.6.11",
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@mui/icons-material": "^7.3.11",
+    "@mui/material": "^7.3.11",
+    "better-auth": "^1.6.11",
+    "framer-motion": "^12.40.0",
+    "mui-one-time-password-input": "^7.0.0",
+    "react": "^19.2.6",
+    "react-audio-visualize": "^1.2.0",
+    "react-dom": "^19.2.6",
+    "react-h5-audio-player": "^3.10.2",
+    "react-lazy-load-image-component": "^1.6.3",
+    "react-player": "^3.4.0",
+    "react-voice-visualizer": "^2.1.0",
+    "unicode-emoji-json": "^0.9.0",
+    "wavesurfer.js": "^7.12.7",
+    "zustand": "^5.0.13"
+  }
+}
