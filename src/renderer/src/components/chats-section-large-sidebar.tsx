@@ -2,7 +2,6 @@ import ChatsHeaderLargeSideBar from './chats-header-large-sidebar';
 import ChatsSideBarContent from './chats-sidebar-content';
 import ChatsSearchHeaderLargeSidebar from './chats-search-header-large-sidebar';
 import { useState } from 'react';
-import NotificationServicesPermissionAlert from './notification-services-permission-alert';
 import Fab from '@mui/material/Fab';
 import { Add } from '@mui/icons-material';
 import { getLocaleFromCookie, isRTLClient } from '../lib/locale-client';
@@ -16,6 +15,7 @@ export default function ChatsSectionLargeSideBar({ logout }: Props) {
     const isRTL = locale ? isRTLClient(locale) : false;
 
     const [activeChatTab, setActiveChatTab] = useState<'all' | 'unread' | 'favourites' | 'groups'>('all');
+    const [searchQuery, setSearchQuery] = useState("");
 
     return (
         <div className={`flex flex-col space-y-4 h-full max-h-full min-h-full w-full ${isRTL ? 'border-l' : 'border-r'} dark:border-neutral-700 border-neutral-300`}>
@@ -24,11 +24,13 @@ export default function ChatsSectionLargeSideBar({ logout }: Props) {
                 <ChatsSearchHeaderLargeSidebar
                     activeChatTab={activeChatTab}
                     setActiveChatTab={setActiveChatTab}
+                    searchQuery={searchQuery}
+                    setSearchQuery={setSearchQuery}
                 />
-                <NotificationServicesPermissionAlert />
             </div>
             <ChatsSideBarContent
                 activeChatTab={activeChatTab}
+                searchQuery={searchQuery}
             />
             <div className='absolute bottom-6 left-6 right-6 z-50 flex md:hidden justify-end'>
                 <Fab color="success" sx={{ backgroundColor: "#25D366" }} aria-label="add">

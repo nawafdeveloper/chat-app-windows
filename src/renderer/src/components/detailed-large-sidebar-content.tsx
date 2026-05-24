@@ -64,6 +64,7 @@ import { useSubsidebarStore } from '../store/use-active-subsidebar-store';
 import { useRightSideContactCreateStore } from '../store/use-right-side-contact-create-store';
 import { splitPhoneNumber } from '../utils/split-phone-number';
 import { encryptContactPayload } from '../lib/contact-crypto';
+import { electronApiFetch } from '../lib/electron-api-fetch';
 import { useCryptoKeys } from '../context/crypto';
 
 type RawChatItem = Omit<ChatItemType, "created_at" | "updated_at"> & {
@@ -292,7 +293,7 @@ export default function DetailedLargeSidebarContent({
         setGroupError(null);
 
         try {
-            const response = await fetch(`https://halabakk-web.nawaf-alhasosah.workers.dev//api/chats/${encodeURIComponent(chatId)}`, {
+            const response = await fetch(`https://halabakk-web.nawaf-alhasosah.workers.dev/api/chats/${encodeURIComponent(chatId)}`, {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ displayName: groupNameDraft.trim() }),
@@ -344,9 +345,8 @@ export default function DetailedLargeSidebarContent({
                 contact_avatar: contact.contact_avatar,
                 contact_bio: contact.contact_bio,
             });
-            const response = await fetch("https://halabakk-web.nawaf-alhasosah.workers.dev//api/contacts", {
+            const response = await electronApiFetch("/api/contacts", {
                 method: "PATCH",
-                credentials: "same-origin",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     contactId: contact.contact_id,
@@ -393,7 +393,7 @@ export default function DetailedLargeSidebarContent({
 
         try {
             const upload = await uploadEncryptedMessageMedia(file, recipients, null);
-            const response = await fetch(`https://halabakk-web.nawaf-alhasosah.workers.dev//api/chats/${encodeURIComponent(chatId)}`, {
+            const response = await fetch(`https://halabakk-web.nawaf-alhasosah.workers.dev/api/chats/${encodeURIComponent(chatId)}`, {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ avatar: upload.mediaUrl }),
@@ -436,7 +436,7 @@ export default function DetailedLargeSidebarContent({
         setGroupError(null);
 
         try {
-            const response = await fetch(`https://halabakk-web.nawaf-alhasosah.workers.dev//api/chats/${encodeURIComponent(chatId)}/members`, {
+            const response = await fetch(`https://halabakk-web.nawaf-alhasosah.workers.dev/api/chats/${encodeURIComponent(chatId)}/members`, {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ memberUserId: member.user_id, isAdmin }),
@@ -466,7 +466,7 @@ export default function DetailedLargeSidebarContent({
         setGroupError(null);
 
         try {
-            const response = await fetch(`https://halabakk-web.nawaf-alhasosah.workers.dev//api/chats/${encodeURIComponent(chatId)}/members`, {
+            const response = await fetch(`https://halabakk-web.nawaf-alhasosah.workers.dev/api/chats/${encodeURIComponent(chatId)}/members`, {
                 method: "DELETE",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ memberUserId: member.user_id }),
@@ -512,7 +512,7 @@ export default function DetailedLargeSidebarContent({
         setGroupError(null);
 
         try {
-            const response = await fetch(`https://halabakk-web.nawaf-alhasosah.workers.dev//api/chats/${encodeURIComponent(chatId)}`, {
+            const response = await fetch(`https://halabakk-web.nawaf-alhasosah.workers.dev/api/chats/${encodeURIComponent(chatId)}`, {
                 method: "DELETE",
             });
 
@@ -612,7 +612,7 @@ export default function DetailedLargeSidebarContent({
                 "Added to group",
                 [...recipientsByUserId.values()]
             );
-            const response = await fetch(`https://halabakk-web.nawaf-alhasosah.workers.dev//api/chats/${encodeURIComponent(chatId)}/members`, {
+            const response = await fetch(`https://halabakk-web.nawaf-alhasosah.workers.dev/api/chats/${encodeURIComponent(chatId)}/members`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({

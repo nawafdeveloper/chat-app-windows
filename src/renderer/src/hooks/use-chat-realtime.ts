@@ -140,7 +140,7 @@ export function useChatRealtime() {
                 setChatsLoading(true);
                 setChatsError(null);
 
-                const response = await fetchWithNeonColdBootRetry("/api/chats", {
+                const response = await fetchWithNeonColdBootRetry("https://halabakk-web.nawaf-alhasosah.workers.dev/api/chats", {
                     cache: "no-store",
                 });
                 if (!response.ok) {
@@ -229,7 +229,7 @@ export function useChatRealtime() {
             try {
                 setMessagesLoading(selectedChatId, true);
                 const response = await fetchWithNeonColdBootRetry(
-                    `/api/messages?chatRoomId=${encodeURIComponent(selectedChatId)}&limit=20`,
+                    `https://halabakk-web.nawaf-alhasosah.workers.dev/api/messages?chatRoomId=${encodeURIComponent(selectedChatId)}&limit=20`,
                     { cache: "no-store" }
                 );
                 if (!response.ok) {
@@ -625,7 +625,7 @@ export function useChatRealtime() {
         const connect = () => {
             setStatus("connecting");
             const protocol = window.location.protocol === "https:" ? "wss" : "ws";
-            socket = new WebSocket(`${protocol}://${window.location.host}https://halabakk-web.nawaf-alhasosah.workers.dev//api/realtime`);
+            socket = new WebSocket(`wss://halabakk-web.nawaf-alhasosah.workers.dev/api/realtime`);
             setSocket(socket);
 
             socket.addEventListener("open", () => {

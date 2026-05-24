@@ -149,7 +149,7 @@ export default function ChatItemMoreButtonMenu({
         setGroupError(null);
 
         try {
-            const response = await fetch(`https://halabakk-web.nawaf-alhasosah.workers.dev//api/chats/${encodeURIComponent(chatId)}`, {
+            const response = await fetch(`https://halabakk-web.nawaf-alhasosah.workers.dev/api/chats/${encodeURIComponent(chatId)}`, {
                 method: "DELETE",
             });
 

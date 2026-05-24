@@ -51,6 +51,7 @@ import {
     getContactDisplayName,
 } from "../lib/contact-display";
 import { normalizePhoneNumber } from "../lib/contact-utils";
+import { electronApiFetch } from "../lib/electron-api-fetch";
 import { logMediaDebug } from "../lib/message-media-debug";
 import { getMessageMediaAutoDownload } from "../lib/message-media";
 import { fetchAndDecryptMessageMedia } from "../lib/message-media-upload";
@@ -356,7 +357,7 @@ export default function ChatRoomMessageBubble({
         );
 
         try {
-            const response = await fetch("https://halabakk-web.nawaf-alhasosah.workers.dev//api/messages", {
+            const response = await fetch("https://halabakk-web.nawaf-alhasosah.workers.dev/api/messages", {
                 method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",
@@ -475,11 +476,10 @@ export default function ChatRoomMessageBubble({
                 contact.linked_user_id ?? sharedContact?.linked_user_id ?? null;
 
             if (!linkedUserId) {
-                const response = await fetch(
-                    `https://halabakk-web.nawaf-alhasosah.workers.dev//api/contacts/check?phone=${encodeURIComponent(normalizedPhone)}`,
+                const response = await electronApiFetch(
+                    `/api/contacts/check?phone=${encodeURIComponent(normalizedPhone)}`,
                     {
                         cache: "no-store",
-                        credentials: "same-origin",
                     }
                 );
 
@@ -501,9 +501,8 @@ export default function ChatRoomMessageBubble({
                 contact_number: normalizedPhone,
                 contact_avatar: contact.contact_avatar,
             });
-            const response = await fetch("https://halabakk-web.nawaf-alhasosah.workers.dev//api/contacts", {
+            const response = await electronApiFetch("/api/contacts", {
                 method: "POST",
-                credentials: "same-origin",
                 headers: {
                     "Content-Type": "application/json",
                 },

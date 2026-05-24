@@ -3,22 +3,28 @@ import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import InputAdornment from '@mui/material/InputAdornment';
 import TextField from '@mui/material/TextField';
-import { useRef, useState } from 'react';
+import { useRef } from 'react';
 import { getLocaleFromCookie, isRTLClient } from '../lib/locale-client';
 
 interface Props {
     activeChatTab: "all" | "unread" | "favourites" | "groups";
     setActiveChatTab: (value: "all" | "unread" | "favourites" | "groups") => void;
+    searchQuery: string;
+    setSearchQuery: (value: string) => void;
 }
 
-export default function ChatsSearchHeaderLargeSidebar({ activeChatTab, setActiveChatTab }: Props) {
-    const [value, setValue] = useState("");
+export default function ChatsSearchHeaderLargeSidebar({
+    activeChatTab,
+    setActiveChatTab,
+    searchQuery,
+    setSearchQuery,
+}: Props) {
     const inputRef = useRef<HTMLInputElement>(null);
     const locale = getLocaleFromCookie();
     const isRTL = locale ? isRTLClient(locale) : false;
 
     const handleClear = () => {
-        setValue("");
+        setSearchQuery("");
         inputRef.current?.blur();
     };
 
@@ -53,8 +59,8 @@ export default function ChatsSearchHeaderLargeSidebar({ activeChatTab, setActive
                 variant="filled"
                 size="small"
                 placeholder={isRTL ? 'البحث عن جهة اتصال' : 'Search for contact'}
-                value={value}
-                onChange={(e) => setValue(e.target.value)}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 inputRef={inputRef}
                 sx={{
                     "& .MuiFilledInput-root": {
@@ -78,7 +84,7 @@ export default function ChatsSearchHeaderLargeSidebar({ activeChatTab, setActive
                             />
                         </InputAdornment>
                     ),
-                    endAdornment: value ? (
+                    endAdornment: searchQuery ? (
                         <InputAdornment position="end">
                             <IconButton onClick={handleClear} size="small">
                                 <CloseOutlined

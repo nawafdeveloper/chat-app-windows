@@ -18,6 +18,12 @@ import {
   WINDOW_MINIMIZE_CHANNEL,
   WINDOW_TOGGLE_MAXIMIZE_CHANNEL,
 } from "../shared/window-ipc";
+import {
+  NOTIFICATION_CLICKED_CHANNEL,
+  NOTIFICATION_SHOW_CHANNEL,
+  type NativeNotificationClickPayload,
+  type NativeNotificationPayload,
+} from "../shared/notification-ipc";
 
 type ElectronAPI = {
   platform: string;
@@ -37,6 +43,10 @@ type ElectronAPI = {
   closeWindow: () => Promise<void>;
   isWindowMaximized: () => Promise<boolean>;
   onWindowMaximizedChange: (callback: (isMaximized: boolean) => void) => () => void;
+  showNativeNotification: (payload: NativeNotificationPayload) => Promise<boolean>;
+  onNativeNotificationClick: (
+    callback: (payload: NativeNotificationClickPayload) => void
+  ) => () => void;
 };
 
 const electronAPI: ElectronAPI = {
@@ -65,6 +75,22 @@ const electronAPI: ElectronAPI = {
 
     return () => {
       ipcRenderer.removeListener(WINDOW_MAXIMIZED_CHANGE_CHANNEL, listener);
+    };
+  },
+  showNativeNotification: (payload) =>
+    ipcRenderer.invoke(NOTIFICATION_SHOW_CHANNEL, payload),
+  onNativeNotificationClick: (callback) => {
+    const listener = (
+      _event: Electron.IpcRendererEvent,
+      payload: NativeNotificationClickPayload
+    ) => {
+      callback(payload);
+    };
+
+    ipcRenderer.on(NOTIFICATION_CLICKED_CHANNEL, listener);
+
+    return () => {
+      ipcRenderer.removeListener(NOTIFICATION_CLICKED_CHANNEL, listener);
     };
   },
 };

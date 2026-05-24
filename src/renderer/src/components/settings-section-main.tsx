@@ -82,54 +82,6 @@ export default function SettingsSectionMain() {
                 width: '100%',
             }}
         >
-            <TextField
-                hiddenLabel
-                id="filled-search-bar"
-                variant="filled"
-                size="small"
-                placeholder={isRTL ? "إبحث في الإعدادات" : "Search for settings"}
-                value={value}
-                onChange={(e) => setValue(e.target.value)}
-                inputRef={inputRef}
-                sx={{
-                    "& .MuiFilledInput-root": {
-                        borderRadius: 8,
-                        "&.Mui-focused": {
-                            outline: "2px solid #25D366",
-                        },
-                    },
-                    width: '100%',
-                }}
-                InputProps={{
-                    disableUnderline: true,
-                    startAdornment: (
-                        <InputAdornment position="start">
-                            <SearchOutlined
-                                sx={{
-                                    color: (theme) =>
-                                        theme.palette.mode === "dark" ? "#A5A5A5" : "#636261",
-                                    width: 20,
-                                    height: 20,
-                                }}
-                            />
-                        </InputAdornment>
-                    ),
-                    endAdornment: value ? (
-                        <InputAdornment position="end">
-                            <IconButton onClick={handleClear} size="small">
-                                <CloseOutlined
-                                    sx={{
-                                        color: (theme) =>
-                                            theme.palette.mode === "dark" ? "#A5A5A5" : "#636261",
-                                        width: 18,
-                                        height: 18,
-                                    }}
-                                />
-                            </IconButton>
-                        </InputAdornment>
-                    ) : null,
-                }}
-            />
             <button className='cursor-pointer' onClick={() => navigateToSettings('settings-profile')}>
                 <DecryptedProfileImage
                     imageUrl={session?.user.image ?? ''}

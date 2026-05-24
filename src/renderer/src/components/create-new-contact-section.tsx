@@ -2,6 +2,7 @@ import { useCryptoKeys } from "../context/crypto";
 import { encryptContactPayload, sha256Hex } from "../lib/contact-crypto";
 import { buildFullPhoneNumber } from "../lib/contact-utils";
 import { countries } from "../lib/countries-code";
+import { electronApiFetch } from "../lib/electron-api-fetch";
 import { getLocaleFromCookie, isRTLClient } from "../lib/locale-client";
 import { useSubsidebarStore } from "../store/use-active-subsidebar-store";
 import type { ContactCheckResponse } from "../types/contacts.type";
@@ -68,11 +69,10 @@ export default function CreateNewContactSection({ country }: Props) {
             try {
                 setAccountStatus("checking");
 
-                const response = await fetch(
-                    `https://halabakk-web.nawaf-alhasosah.workers.dev//api/contacts/check?phone=${encodeURIComponent(fullPhoneNumber)}`,
+                const response = await electronApiFetch(
+                    `/api/contacts/check?phone=${encodeURIComponent(fullPhoneNumber)}`,
                     {
                         cache: "no-store",
-                        credentials: "same-origin",
                     }
                 );
 
@@ -216,9 +216,8 @@ export default function CreateNewContactSection({ country }: Props) {
                 contact_number: fullPhoneNumber,
             });
             const phoneHash = await sha256Hex(fullPhoneNumber);
-            const response = await fetch("https://halabakk-web.nawaf-alhasosah.workers.dev//api/contacts", {
+            const response = await electronApiFetch("/api/contacts", {
                 method: "POST",
-                credentials: "same-origin",
                 headers: {
                     "Content-Type": "application/json",
                 },

@@ -405,7 +405,7 @@ export function useSendChatMessage() {
             }
 
             if (!realtimeSent) {
-                const response = await fetch("https://halabakk-web.nawaf-alhasosah.workers.dev//api/messages", {
+                const response = await fetch("https://halabakk-web.nawaf-alhasosah.workers.dev/api/messages", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -886,7 +886,7 @@ async function reconcilePendingMessage({
     }
 
     try {
-        const postResponse = await fetch("https://halabakk-web.nawaf-alhasosah.workers.dev//api/messages", {
+        const postResponse = await fetch("https://halabakk-web.nawaf-alhasosah.workers.dev/api/messages", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -929,7 +929,7 @@ async function reconcilePendingMessage({
         }
 
         const response = await fetch(
-            `https://halabakk-web.nawaf-alhasosah.workers.dev//api/messages?chatRoomId=${encodeURIComponent(chatId)}&limit=40`,
+            `https://halabakk-web.nawaf-alhasosah.workers.dev/api/messages?chatRoomId=${encodeURIComponent(chatId)}&limit=40`,
             { cache: "no-store" }
         );
 

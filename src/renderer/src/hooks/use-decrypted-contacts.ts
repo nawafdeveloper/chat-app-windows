@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useCryptoKeys } from "../context/crypto";
 import { authClient } from "../lib/auth-client";
 import { decryptStoredContact } from "../lib/contact-crypto";
+import { electronApiFetch } from "../lib/electron-api-fetch";
 import { useContactDirectoryStore } from "../store/use-contact-directory-store";
 import type { Contact, StoredContactRecord } from "../types/contacts.type";
 
@@ -54,9 +55,8 @@ export function useDecryptedContacts() {
                 setLoading(true);
                 setError(null);
 
-                const response = await fetch("https://halabakk-web.nawaf-alhasosah.workers.dev//api/contacts", {
+                const response = await electronApiFetch("/api/contacts", {
                     cache: "no-store",
-                    credentials: "same-origin",
                 });
 
                 if (!response.ok) {

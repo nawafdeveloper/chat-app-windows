@@ -4,6 +4,7 @@ import Image from "./electron-image";
 import ChatsMoreButtonMenu from "./chats-more-button-menu";
 import { useSidebarStore } from "../store/use-active-sidebar-store";
 import { getLocaleFromCookie, isRTLClient } from '../lib/locale-client';
+import { Typography } from "@mui/material";
 
 type Props = {
     logout: () => void;
@@ -16,13 +17,16 @@ export default function ChatsHeaderLargeSideBar({ logout }: Props) {
 
     return (
         <div className="app-region-drag flex flex-row items-center justify-between">
-            <Image
-                src={locale === 'ar' ? "yahla-arabic-brand.svg" : "yahla-english-brand.svg"}
-                alt="HalaBaak Corp.©"
-                width={200}
-                height={200}
-                className="w-auto h-7 object-contain"
-            />
+            <Typography
+                variant="h5"
+                sx={(theme) => ({
+                    color: theme.palette.mode === "dark" ? "#ffffff" : "#000000",
+                    fontWeight: 600,
+                    textAlign: isRTL ? "right" : "left",
+                })}
+            >
+                {isRTL ? "المحادثات" : "Chats"}
+            </Typography>
             <div className={`flex flex-row items-center gap-x-3`}>
                 <Tooltip
                     title={isRTL ? 'إنشاء محادثة جديدة' : 'Create new chat'}
@@ -61,7 +65,7 @@ export default function ChatsHeaderLargeSideBar({ logout }: Props) {
                         </svg>
                     </IconButton>
                 </Tooltip>
-                <ChatsMoreButtonMenu logout={logout}/>
+                <ChatsMoreButtonMenu logout={logout} />
             </div>
         </div>
     )

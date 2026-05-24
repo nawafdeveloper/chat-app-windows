@@ -8,6 +8,7 @@ import { createMessageMediaPreview } from "./message-media-preview";
 import { base64ToBuffer, bufferToBase64 } from "./crypto-pin";
 import { decryptFileWithAes, encryptFileWithAes } from "./profile-image-encryption";
 import { parseManagedMessageMediaUrl } from "./message-media-url";
+import { electronApiFetch } from "./electron-api-fetch";
 import type { RecipientEncryptedAesKeyInput } from "../types/crypto";
 
 const SESSION_KEYS_STORAGE_KEY = "yhla_session_keys";
@@ -170,8 +171,9 @@ export async function uploadEncryptedMessageMedia(
         );
     }
 
-    const response = await fetch("https://halabakk-web.nawaf-alhasosah.workers.dev//api/message-media", {
+    const response = await fetch("https://halabakk-web.nawaf-alhasosah.workers.dev/api/message-media", {
         method: "POST",
+        credentials: "include",
         headers: buildMediaDebugHeaders(debugTraceId),
         body: formData,
     });
@@ -236,7 +238,7 @@ export async function fetchAndDecryptMessageMedia(
         return cachedBlob;
     }
 
-    const keyResponse = await fetch(`https://halabakk-web.nawaf-alhasosah.workers.dev//api/message-media/key/${parsed.objectKey}`);
+    const keyResponse = await electronApiFetch(`/api/message-media/key/${parsed.objectKey}`);
     if (!keyResponse.ok) {
         logMediaDebug("client.decrypt.key-failed", {
             objectKey: parsed.objectKey,
@@ -255,7 +257,9 @@ export async function fetchAndDecryptMessageMedia(
         sessionKeys.privateKey
     );
 
-    const mediaResponse = await fetch(`https://halabakk-web.nawaf-alhasosah.workers.dev//api/message-media/${parsed.objectKey}`);
+    const mediaResponse = await fetch(`https://halabakk-web.nawaf-alhasosah.workers.dev/api/message-media/${parsed.objectKey}`, {
+        credentials: "include",
+    });
     if (!mediaResponse.ok) {
         logMediaDebug("client.decrypt.media-failed", {
             objectKey: parsed.objectKey,

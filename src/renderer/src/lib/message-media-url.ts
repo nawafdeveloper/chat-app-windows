@@ -1,5 +1,7 @@
-export const MESSAGE_MEDIA_API_PATH = "https://halabakk-web.nawaf-alhasosah.workers.dev//api/message-media";
-export const MESSAGE_MEDIA_PREVIEW_API_PATH = "https://halabakk-web.nawaf-alhasosah.workers.dev//api/message-media-preview";
+export const MESSAGE_MEDIA_API_PATH = "https://halabakk-web.nawaf-alhasosah.workers.dev/api/message-media";
+export const MESSAGE_MEDIA_PREVIEW_API_PATH = "https://halabakk-web.nawaf-alhasosah.workers.dev/api/message-media-preview";
+const MESSAGE_MEDIA_API_PATHNAME = new URL(MESSAGE_MEDIA_API_PATH).pathname;
+const MESSAGE_MEDIA_PREVIEW_API_PATHNAME = new URL(MESSAGE_MEDIA_PREVIEW_API_PATH).pathname;
 
 export async function buildMessageMediaObjectKey(
     userId: string
@@ -53,12 +55,12 @@ export function parseManagedMessageMediaUrl(mediaUrl?: string | null): {
     try {
         const parsed = new URL(mediaUrl, "http://localhost");
 
-        if (!parsed.pathname.startsWith(MESSAGE_MEDIA_API_PATH)) {
+        if (!parsed.pathname.startsWith(MESSAGE_MEDIA_API_PATHNAME)) {
             return null;
         }
 
         const objectKey = decodeURIComponent(
-            parsed.pathname.replace(`${MESSAGE_MEDIA_API_PATH}/`, "")
+            parsed.pathname.replace(`${MESSAGE_MEDIA_API_PATHNAME}/`, "")
         );
 
         if (!objectKey) {
@@ -81,12 +83,12 @@ export function parseManagedMessageMediaPreviewUrl(previewUrl?: string | null): 
     try {
         const parsed = new URL(previewUrl, "http://localhost");
 
-        if (!parsed.pathname.startsWith(MESSAGE_MEDIA_PREVIEW_API_PATH)) {
+        if (!parsed.pathname.startsWith(MESSAGE_MEDIA_PREVIEW_API_PATHNAME)) {
             return null;
         }
 
         const objectKey = decodeURIComponent(
-            parsed.pathname.replace(`${MESSAGE_MEDIA_PREVIEW_API_PATH}/`, "")
+            parsed.pathname.replace(`${MESSAGE_MEDIA_PREVIEW_API_PATHNAME}/`, "")
         );
 
         if (!objectKey) {

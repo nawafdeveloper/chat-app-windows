@@ -35,7 +35,7 @@ export default function NotificationServicesPermissionAlert() {
 
             setIsSupported(true)
 
-            const clientConfigResponse = await fetch('https://halabakk-web.nawaf-alhasosah.workers.dev//api/push/config', {
+            const clientConfigResponse = await fetch('https://halabakk-web.nawaf-alhasosah.workers.dev/api/push/config', {
                 cache: 'no-store',
             })
             if (!clientConfigResponse.ok) {
@@ -60,7 +60,7 @@ export default function NotificationServicesPermissionAlert() {
             setSubscription(existingSubscription)
 
             if (existingSubscription) {
-                await fetch('https://halabakk-web.nawaf-alhasosah.workers.dev//api/push/subscription', {
+                await fetch('https://halabakk-web.nawaf-alhasosah.workers.dev/api/push/subscription', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -94,7 +94,7 @@ export default function NotificationServicesPermissionAlert() {
             applicationServerKey: urlBase64ToUint8Array(publicKey),
         })
         setSubscription(sub)
-        await fetch('https://halabakk-web.nawaf-alhasosah.workers.dev//api/push/subscription', {
+        await fetch('https://halabakk-web.nawaf-alhasosah.workers.dev/api/push/subscription', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -107,7 +107,7 @@ export default function NotificationServicesPermissionAlert() {
 
     async function unsubscribe() {
         await subscription?.unsubscribe()
-        await fetch('https://halabakk-web.nawaf-alhasosah.workers.dev//api/push/subscription', {
+        await fetch('https://halabakk-web.nawaf-alhasosah.workers.dev/api/push/subscription', {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',

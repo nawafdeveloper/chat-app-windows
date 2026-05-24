@@ -1,7 +1,10 @@
 node_modules/
 dist/
 out/
-build/
+release/
+build/*
+!build/
+!build/icon.ico
 .env
 .env.*
 *.log

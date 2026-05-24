@@ -5,6 +5,10 @@ import type {
   SendPhoneOtpRequest,
   VerifyPhoneOtpRequest,
 } from "../../../shared/auth-ipc";
+import type {
+  NativeNotificationClickPayload,
+  NativeNotificationPayload,
+} from "../../../shared/notification-ipc";
 
 declare global {
   type ElectronAPI = {
@@ -25,6 +29,10 @@ declare global {
     closeWindow: () => Promise<void>;
     isWindowMaximized: () => Promise<boolean>;
     onWindowMaximizedChange: (callback: (isMaximized: boolean) => void) => () => void;
+    showNativeNotification: (payload: NativeNotificationPayload) => Promise<boolean>;
+    onNativeNotificationClick: (
+      callback: (payload: NativeNotificationClickPayload) => void
+    ) => () => void;
   };
 
   interface Window {

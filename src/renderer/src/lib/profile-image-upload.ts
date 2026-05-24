@@ -4,6 +4,7 @@ import { logMediaDebug } from "./message-media-debug";
 import { decryptFileWithAes, encryptFileWithAes } from "./profile-image-encryption";
 import { parseManagedProfileImageUrl } from "./profile-image-url";
 import { getSessionCryptoKeys } from "./text-encryption";
+import { electronApiFetch } from "./electron-api-fetch";
 
 export interface ProfileImageUploadResult {
     imageUrl: string;
@@ -120,8 +121,9 @@ export async function uploadEncryptedProfileImage(
     formData.append("iv", iv);
     formData.append("recipientKeys", JSON.stringify(recipientKeys));
 
-    const response = await fetch("https://halabakk-web.nawaf-alhasosah.workers.dev//api/profile-image", {
+    const response = await fetch("https://halabakk-web.nawaf-alhasosah.workers.dev/api/profile-image", {
         method: "POST",
+        credentials: "include",
         body: formData,
     });
 
@@ -147,7 +149,7 @@ export async function shareEncryptedProfileImageWithRecipients(
         throw new Error("No private key found in session. Please unlock your keys again.");
     }
 
-    const keyResponse = await fetch(`https://halabakk-web.nawaf-alhasosah.workers.dev//api/profile-image/key/${parsed.objectKey}`);
+    const keyResponse = await electronApiFetch(`/api/profile-image/key/${parsed.objectKey}`);
     if (!keyResponse.ok) {
         return false;
     }
@@ -173,7 +175,7 @@ export async function shareEncryptedProfileImageWithRecipients(
         return false;
     }
 
-    const response = await fetch(`https://halabakk-web.nawaf-alhasosah.workers.dev//api/profile-image/key/${parsed.objectKey}`, {
+    const response = await electronApiFetch(`/api/profile-image/key/${parsed.objectKey}`, {
         method: "PATCH",
         headers: {
             "Content-Type": "application/json",
@@ -202,7 +204,7 @@ export async function fetchAndDecryptProfileImage(objectKey: string): Promise<Bl
         throw new Error("No private key found in session. Please unlock your keys again.");
     }
 
-    const keyResponse = await fetch(`https://halabakk-web.nawaf-alhasosah.workers.dev//api/profile-image/key/${objectKey}`);
+    const keyResponse = await electronApiFetch(`/api/profile-image/key/${objectKey}`);
     if (!keyResponse.ok) {
         logMediaDebug("client.profile-image.decrypt.key-failed", {
             objectKey,
@@ -235,7 +237,9 @@ export async function fetchAndDecryptProfileImage(objectKey: string): Promise<Bl
         throw new Error("Failed to decrypt profile image key.");
     }
 
-    const imageResponse = await fetch(`https://halabakk-web.nawaf-alhasosah.workers.dev//api/profile-image/${objectKey}`);
+    const imageResponse = await fetch(`https://halabakk-web.nawaf-alhasosah.workers.dev/api/profile-image/${objectKey}`, {
+        credentials: "include",
+    });
     if (!imageResponse.ok) {
         logMediaDebug("client.profile-image.decrypt.image-failed", {
             objectKey,

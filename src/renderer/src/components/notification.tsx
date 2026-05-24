@@ -1,4 +1,4 @@
-import { useEffect, useRef, type MutableRefObject } from "react";
+import { useEffect, useRef } from "react";
 import { authClient } from "../lib/auth-client";
 import {
     CHAT_MESSAGE_NOTIFICATION_EVENT,
@@ -6,7 +6,7 @@ import {
     type ChatMessageNotificationEventDetail,
 } from "../lib/message-notifications";
 import { publicAssetSrc } from "../lib/public-assets";
-import type { Message } from "../types/messages.type";
+import { useActiveChatStore } from "../store/use-active-chat-store";
 
 type NotificationUser = {
     id?: string;
@@ -14,21 +14,19 @@ type NotificationUser = {
     disableGroupsNotifications?: boolean | null;
 };
 
-type SerializableMessage = Omit<Message, "created_at" | "updated_at"> & {
-    created_at: string;
-    updated_at: string;
-};
+const NOTIFICATION_SOUND_SRC = publicAssetSrc(
+    "universfield-new-notification-07-210334.mp3"
+);
 
-type NotificationOptionsWithRenotify = NotificationOptions & {
-    renotify?: boolean;
-};
+function playNotificationSound(audio: HTMLAudioElement | null) {
+    if (!audio) {
+        return;
+    }
 
-function serializeMessage(message: Message): SerializableMessage {
-    return {
-        ...message,
-        created_at: message.created_at.toISOString(),
-        updated_at: message.updated_at.toISOString(),
-    };
+    audio.currentTime = 0;
+    void audio.play().catch(() => {
+        // Electron can still block autoplay before the first user interaction.
+    });
 }
 
 function getNotificationTitle(detail: ChatMessageNotificationEventDetail) {
@@ -56,50 +54,35 @@ function getNotificationBody(detail: ChatMessageNotificationEventDetail) {
     return senderName ? `${senderName}: ${preview}` : preview;
 }
 
-async function showNotification({
-    title,
-    options,
-    registrationRef,
-}: {
-    title: string;
-    options: NotificationOptionsWithRenotify;
-    registrationRef: MutableRefObject<ServiceWorkerRegistration | null>;
-}) {
-    if (!("Notification" in window) || window.Notification.permission !== "granted") {
-        return;
-    }
-
-    if ("serviceWorker" in navigator) {
-        try {
-            if (!registrationRef.current) {
-                registrationRef.current = await navigator.serviceWorker.register(
-                    "/sw.js",
-                    {
-                        scope: "/",
-                        updateViaCache: "none",
-                    }
-                );
-            }
-
-            await registrationRef.current.showNotification(title, options);
-            return;
-        } catch {
-            // Fall back to the page-level Notifications API below.
-        }
-    }
-
-    new window.Notification(title, options);
-}
-
 export default function Notification() {
     const { data: session } = authClient.useSession();
+    const setSelectedChatId = useActiveChatStore((state) => state.setSelectedChatId);
     const sessionUserRef = useRef<NotificationUser | null>(null);
     const shownMessageIdsRef = useRef<Set<string>>(new Set());
-    const registrationRef = useRef<ServiceWorkerRegistration | null>(null);
+    const notificationSoundRef = useRef<HTMLAudioElement | null>(null);
 
     useEffect(() => {
         sessionUserRef.current = (session?.user as NotificationUser | undefined) ?? null;
     }, [session]);
+
+    useEffect(() => {
+        const audio = new Audio(NOTIFICATION_SOUND_SRC);
+        audio.preload = "auto";
+        notificationSoundRef.current = audio;
+
+        return () => {
+            audio.pause();
+            notificationSoundRef.current = null;
+        };
+    }, []);
+
+    useEffect(() => {
+        return window.electronAPI?.onNativeNotificationClick((payload) => {
+            if (payload.conversationId) {
+                setSelectedChatId(payload.conversationId);
+            }
+        });
+    }, [setSelectedChatId]);
 
     useEffect(() => {
         const handleNewMessage = (event: Event) => {
@@ -138,28 +121,17 @@ export default function Notification() {
 
             const title = getNotificationTitle(detail);
             const body = getNotificationBody(detail);
-            const notificationData = {
-                url: `/?chatId=${encodeURIComponent(detail.conversationId)}`,
+            playNotificationSound(notificationSoundRef.current);
+            void window.electronAPI?.showNativeNotification({
+                title,
+                body,
+                id: detail.message.message_id,
+                tag: `chat-message-${detail.message.message_id}`,
                 conversationId: detail.conversationId,
                 conversationType: detail.conversationType,
                 messageId: detail.message.message_id,
                 unreadCount: detail.unreadCount,
-                title,
-                body,
-                decryptedMessage: serializeMessage(detail.message),
-            };
-
-            void showNotification({
-                title,
-                options: {
-                    body,
-                    icon: publicAssetSrc("icon-192x192.png"),
-                    badge: publicAssetSrc("icon-192x192.png"),
-                    tag: `chat-message-${detail.message.message_id}`,
-                    renotify: true,
-                    data: notificationData,
-                },
-                registrationRef,
+                silent: true,
             });
         };
 

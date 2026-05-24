@@ -164,17 +164,27 @@ async function migrateCookiesFromElectronSession(): Promise<void> {
   }
 }
 
+async function syncElectronSessionCookies(jar: CookieJar): Promise<void> {
+  await Promise.all(
+    Object.entries(jar).map(([name, cookie]) =>
+      setElectronSessionCookie(name, cookie)
+    )
+  );
+}
+
 async function getCookieHeader(): Promise<string> {
   await migrateCookiesFromElectronSession();
 
   const jar = readCookieJar();
   const now = new Date();
   let changed = false;
+  const expiredCookieRemovals: Promise<void>[] = [];
 
   const cookies = Object.entries(jar).flatMap(([name, cookie]) => {
     if (cookie.expires && new Date(cookie.expires) <= now) {
       delete jar[name];
       changed = true;
+      expiredCookieRemovals.push(removeElectronSessionCookie(name));
       return [];
     }
 
@@ -184,6 +194,9 @@ async function getCookieHeader(): Promise<string> {
   if (changed) {
     writeCookieJar(jar);
   }
+
+  await Promise.all(expiredCookieRemovals);
+  await syncElectronSessionCookies(jar);
 
   return cookies.join("; ");
 }
@@ -199,13 +212,47 @@ function getSetCookieHeaders(headers: Headers): string[] {
   return combinedSetCookie ? splitSetCookieHeader(combinedSetCookie) : [];
 }
 
-function mergeSetCookieHeaders(setCookieHeaders: string[]): void {
+async function removeElectronSessionCookie(name: string): Promise<void> {
+  try {
+    await electronSession.defaultSession.cookies.remove(
+      new URL(AUTH_BASE_URL).origin,
+      name
+    );
+  } catch (error) {
+    console.error("Failed to remove Electron auth cookie.", error);
+  }
+}
+
+async function setElectronSessionCookie(
+  name: string,
+  cookie: StoredCookie
+): Promise<void> {
+  try {
+    const authUrl = new URL(AUTH_BASE_URL);
+    await electronSession.defaultSession.cookies.set({
+      url: authUrl.origin,
+      name,
+      value: cookie.value,
+      expirationDate: cookie.expires
+        ? Math.floor(new Date(cookie.expires).getTime() / 1000)
+        : undefined,
+      secure: authUrl.protocol === "https:",
+      httpOnly: true,
+      sameSite: "no_restriction",
+    });
+  } catch (error) {
+    console.error("Failed to set Electron auth cookie.", error);
+  }
+}
+
+async function mergeSetCookieHeaders(setCookieHeaders: string[]): Promise<void> {
   if (setCookieHeaders.length === 0) {
     return;
   }
 
   const jar = readCookieJar();
   const now = Date.now();
+  const electronCookieUpdates: Promise<void>[] = [];
 
   for (const setCookieHeader of setCookieHeaders) {
     const parsedCookies = parseSetCookieHeader(setCookieHeader);
@@ -221,17 +268,21 @@ function mergeSetCookieHeaders(setCookieHeaders: string[]): void {
 
       if (maxAge === 0 || (expires && expires.getTime() <= now) || !cookie.value) {
         delete jar[name];
+        electronCookieUpdates.push(removeElectronSessionCookie(name));
         continue;
       }
 
-      jar[name] = {
+      const storedCookie = {
         value: cookie.value,
         expires: expires ? expires.toISOString() : null,
       };
+      jar[name] = storedCookie;
+      electronCookieUpdates.push(setElectronSessionCookie(name, storedCookie));
     }
   }
 
   writeCookieJar(jar);
+  await Promise.all(electronCookieUpdates);
 }
 
 function assertAuthUrl(url: string): URL {
@@ -263,12 +314,14 @@ async function buildRequestHeaders(payloadHeaders?: [string, string][]): Promise
   return headers;
 }
 
-function clearCookieJar(): void {
+async function clearCookieJar(): Promise<void> {
+  const jar = readCookieJar();
   writeCookieJar({});
+  await Promise.all(Object.keys(jar).map(removeElectronSessionCookie));
 }
 
 function resolveAuthPath(path: string): string {
-  return new URL(path.replace(/^\//, ""), AUTH_BASE_URL).toString();
+  return new URL(`api/auth/${path.replace(/^\//, "")}`, AUTH_BASE_URL).toString();
 }
 
 async function fetchWithElectronSession(payload: AuthFetchRequest): Promise<AuthFetchResponse> {
@@ -284,10 +337,10 @@ async function fetchWithElectronSession(payload: AuthFetchRequest): Promise<Auth
     redirect: payload.init?.redirect,
   });
 
-  mergeSetCookieHeaders(getSetCookieHeaders(response.headers));
+  await mergeSetCookieHeaders(getSetCookieHeaders(response.headers));
 
   if (requestUrl.pathname.endsWith("/sign-out")) {
-    clearCookieJar();
+    await clearCookieJar();
     resetAuthFlowState();
   }
 

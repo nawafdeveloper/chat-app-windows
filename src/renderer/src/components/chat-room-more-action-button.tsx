@@ -185,7 +185,7 @@ export default function ChatRoomMoreActionButton({ chat_type, chat_id }: Props) 
         setGroupError(null);
 
         try {
-            const response = await fetch(`https://halabakk-web.nawaf-alhasosah.workers.dev//api/chats/${encodeURIComponent(chatId)}`, {
+            const response = await fetch(`https://halabakk-web.nawaf-alhasosah.workers.dev/api/chats/${encodeURIComponent(chatId)}`, {
                 method: "DELETE",
             });
 

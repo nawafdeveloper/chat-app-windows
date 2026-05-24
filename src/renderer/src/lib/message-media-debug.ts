@@ -50,7 +50,7 @@ function forwardMediaDebugToServer(
     });
 
     try {
-        void fetch("https://halabakk-web.nawaf-alhasosah.workers.dev//api/media-debug", {
+        void fetch("https://halabakk-web.nawaf-alhasosah.workers.dev/api/media-debug", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

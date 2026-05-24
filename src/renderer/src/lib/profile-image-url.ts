@@ -1,4 +1,5 @@
-export const PROFILE_IMAGE_API_PATH = "https://halabakk-web.nawaf-alhasosah.workers.dev//api/profile-image";
+export const PROFILE_IMAGE_API_PATH = "https://halabakk-web.nawaf-alhasosah.workers.dev/api/profile-image";
+const PROFILE_IMAGE_API_PATHNAME = new URL(PROFILE_IMAGE_API_PATH).pathname;
 
 // ---------------------------------------------------------------------------
 // URL construction
@@ -20,7 +21,7 @@ export async function buildProfileImageObjectKey(userId: string): Promise<string
 
 /**
  * Build the profile image URL.
- * Format: `https://halabakk-web.nawaf-alhasosah.workers.dev//api/profile-image/<objectKey>`
+ * Format: `https://halabakk-web.nawaf-alhasosah.workers.dev/api/profile-image/<objectKey>`
  */
 export function buildProfileImageUrl(objectKey: string): string {
     return `${PROFILE_IMAGE_API_PATH}/${objectKey}`;
@@ -44,12 +45,12 @@ export function parseManagedProfileImageUrl(imageUrl?: string | null): {
     try {
         const parsed = new URL(imageUrl, "http://localhost");
 
-        if (!parsed.pathname.startsWith(PROFILE_IMAGE_API_PATH)) {
+        if (!parsed.pathname.startsWith(PROFILE_IMAGE_API_PATHNAME)) {
             return null;
         }
 
         const objectKey = decodeURIComponent(
-            parsed.pathname.replace(`${PROFILE_IMAGE_API_PATH}/`, "")
+            parsed.pathname.replace(`${PROFILE_IMAGE_API_PATHNAME}/`, "")
         );
 
         if (!objectKey) {
