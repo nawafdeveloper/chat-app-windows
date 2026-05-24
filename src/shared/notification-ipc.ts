@@ -1,5 +1,6 @@
 export const NOTIFICATION_SHOW_CHANNEL = "yahla:notification:show";
 export const NOTIFICATION_CLICKED_CHANNEL = "yahla:notification:clicked";
+export const NOTIFICATION_REPLIED_CHANNEL = "yahla:notification:replied";
 
 export type NativeNotificationPayload = {
   title: string;
@@ -11,9 +12,14 @@ export type NativeNotificationPayload = {
   messageId?: string;
   unreadCount?: number;
   silent?: boolean;
+  avatarDataUrl?: string;
 };
 
 export type NativeNotificationClickPayload = Pick<
   NativeNotificationPayload,
   "conversationId" | "conversationType" | "messageId" | "unreadCount"
 >;
+
+export type NativeNotificationReplyPayload = NativeNotificationClickPayload & {
+  replyText: string;
+};

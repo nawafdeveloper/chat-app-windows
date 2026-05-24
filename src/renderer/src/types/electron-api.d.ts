@@ -8,6 +8,7 @@ import type {
 import type {
   NativeNotificationClickPayload,
   NativeNotificationPayload,
+  NativeNotificationReplyPayload,
 } from "../../../shared/notification-ipc";
 
 declare global {
@@ -33,6 +34,9 @@ declare global {
     onNativeNotificationClick: (
       callback: (payload: NativeNotificationClickPayload) => void
     ) => () => void;
+    onNativeNotificationReply: (
+      callback: (payload: NativeNotificationReplyPayload) => void
+    ) => () => void;
   };
 
   interface Window {
@@ -40,4 +44,4 @@ declare global {
   }
 }
 
-export {};
+export { };

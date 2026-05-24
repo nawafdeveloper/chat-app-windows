@@ -1,9 +1,18 @@
-import { app, BrowserWindow, ipcMain, Menu, Notification, shell } from "electron";
+import {
+  app,
+  BrowserWindow,
+  ipcMain,
+  Menu,
+  Notification,
+  nativeImage,
+  shell,
+} from "electron";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { registerAuthIpc } from "./auth-ipc";
 import {
   NOTIFICATION_CLICKED_CHANNEL,
+  NOTIFICATION_REPLIED_CHANNEL,
   NOTIFICATION_SHOW_CHANNEL,
   type NativeNotificationPayload,
 } from "../shared/notification-ipc";
@@ -53,8 +62,61 @@ function getAppIconPath(): string | undefined {
   return candidates.find((candidate) => existsSync(candidate));
 }
 
-function getWindowFromSender(event: Electron.IpcMainInvokeEvent): BrowserWindow | null {
+function getWindowFromSender(
+  event: Electron.IpcMainInvokeEvent
+): BrowserWindow | null {
   return BrowserWindow.fromWebContents(event.sender);
+}
+
+function makeCircularIcon(image: Electron.NativeImage): Electron.NativeImage {
+  const size = 64;
+  const { width, height } = image.getSize();
+
+  // Resize to square first
+  const resized = image.resize({
+    width: size,
+    height: size,
+    quality: "best",
+  });
+
+  const pixels = resized.toBitmap(); // raw BGRA buffer
+
+  // Paint pixels outside the circle as transparent
+  for (let y = 0; y < size; y++) {
+    for (let x = 0; x < size; x++) {
+      const dx = x - size / 2;
+      const dy = y - size / 2;
+      const isOutside = dx * dx + dy * dy > (size / 2) * (size / 2);
+
+      if (isOutside) {
+        const idx = (y * size + x) * 4;
+        pixels[idx] = 0;       // B
+        pixels[idx + 1] = 0;   // G
+        pixels[idx + 2] = 0;   // R
+        pixels[idx + 3] = 0;   // A (transparent)
+      }
+    }
+  }
+
+  // suppress unused variable warning
+  void width;
+  void height;
+
+  return nativeImage.createFromBitmap(pixels, { width: size, height: size });
+}
+
+function resolveNotificationIcon(
+  avatarDataUrl?: string
+): Electron.NativeImage | string | undefined {
+  if (avatarDataUrl?.startsWith("data:image/")) {
+    try {
+      const image = nativeImage.createFromDataURL(avatarDataUrl);
+      return makeCircularIcon(image);
+    } catch {
+      // fall through to app icon
+    }
+  }
+  return getAppIconPath();
 }
 
 function registerWindowIpc(): void {
@@ -96,15 +158,26 @@ function registerNotificationIpc(): void {
       }
 
       const window = getWindowFromSender(event);
-      const icon = getAppIconPath();
+      const icon = resolveNotificationIcon(payload.avatarDataUrl);
+
       const notification = new Notification({
         title: payload.title,
         body: payload.body,
-        id: payload.id || payload.messageId || payload.tag,
+        id: payload.id ?? payload.messageId ?? payload.tag,
         icon,
         silent: payload.silent,
+        actions: [
+          {
+            type: "button" as Electron.NotificationAction["type"],
+            text: "Reply…",
+          },
+        ],
+        replyPlaceholder: "Write a reply…",
       });
-      const cleanupNotification = () => activeNotifications.delete(notification);
+
+      const cleanupNotification = (): void => {
+        activeNotifications.delete(notification);
+      };
 
       activeNotifications.add(notification);
       notification.on("close", cleanupNotification);
@@ -125,6 +198,26 @@ function registerNotificationIpc(): void {
             conversationType: payload.conversationType,
             messageId: payload.messageId,
             unreadCount: payload.unreadCount,
+          });
+        }
+      });
+
+      notification.on("action", (_event, index, value) => {
+        const replyText = String(value ?? "").trim();
+
+        if (index !== 0 || !replyText) {
+          return;
+        }
+
+        cleanupNotification();
+
+        if (window && !window.isDestroyed()) {
+          window.webContents.send(NOTIFICATION_REPLIED_CHANNEL, {
+            conversationId: payload.conversationId,
+            conversationType: payload.conversationType,
+            messageId: payload.messageId,
+            unreadCount: payload.unreadCount,
+            replyText,
           });
         }
       });

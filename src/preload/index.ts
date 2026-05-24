@@ -20,9 +20,11 @@ import {
 } from "../shared/window-ipc";
 import {
   NOTIFICATION_CLICKED_CHANNEL,
+  NOTIFICATION_REPLIED_CHANNEL,
   NOTIFICATION_SHOW_CHANNEL,
   type NativeNotificationClickPayload,
   type NativeNotificationPayload,
+  type NativeNotificationReplyPayload,
 } from "../shared/notification-ipc";
 
 type ElectronAPI = {
@@ -46,6 +48,9 @@ type ElectronAPI = {
   showNativeNotification: (payload: NativeNotificationPayload) => Promise<boolean>;
   onNativeNotificationClick: (
     callback: (payload: NativeNotificationClickPayload) => void
+  ) => () => void;
+  onNativeNotificationReply: (
+    callback: (payload: NativeNotificationReplyPayload) => void
   ) => () => void;
 };
 
@@ -91,6 +96,20 @@ const electronAPI: ElectronAPI = {
 
     return () => {
       ipcRenderer.removeListener(NOTIFICATION_CLICKED_CHANNEL, listener);
+    };
+  },
+  onNativeNotificationReply: (callback) => {
+    const listener = (
+      _event: Electron.IpcRendererEvent,
+      payload: NativeNotificationReplyPayload
+    ) => {
+      callback(payload);
+    };
+
+    ipcRenderer.on(NOTIFICATION_REPLIED_CHANNEL, listener);
+
+    return () => {
+      ipcRenderer.removeListener(NOTIFICATION_REPLIED_CHANNEL, listener);
     };
   },
 };

@@ -5,6 +5,7 @@ import {
     getMessageNotificationPreview,
     type ChatMessageNotificationEventDetail,
 } from "../lib/message-notifications";
+import { resolveAvatarDataUrl } from "../lib/resolve-avatar-data-url";
 import { publicAssetSrc } from "../lib/public-assets";
 import { useActiveChatStore } from "../store/use-active-chat-store";
 
@@ -85,6 +86,17 @@ export default function Notification() {
     }, [setSelectedChatId]);
 
     useEffect(() => {
+        return window.electronAPI?.onNativeNotificationReply((payload) => {
+            if (!payload.conversationId || !payload.replyText) {
+                return;
+            }
+
+            // TODO: wire to your sendMessage action
+            // sendMessage(payload.conversationId, payload.replyText);
+        });
+    }, []);
+
+    useEffect(() => {
         const handleNewMessage = (event: Event) => {
             const detail = (event as CustomEvent<ChatMessageNotificationEventDetail>)
                 .detail;
@@ -121,18 +133,25 @@ export default function Notification() {
 
             const title = getNotificationTitle(detail);
             const body = getNotificationBody(detail);
+
             playNotificationSound(notificationSoundRef.current);
-            void window.electronAPI?.showNativeNotification({
-                title,
-                body,
-                id: detail.message.message_id,
-                tag: `chat-message-${detail.message.message_id}`,
-                conversationId: detail.conversationId,
-                conversationType: detail.conversationType,
-                messageId: detail.message.message_id,
-                unreadCount: detail.unreadCount,
-                silent: true,
-            });
+
+            void resolveAvatarDataUrl(detail.chat?.avatar ?? null)
+                .catch(() => null)
+                .then((avatarDataUrl) => {
+                    void window.electronAPI?.showNativeNotification({
+                        title,
+                        body,
+                        id: detail.message.message_id,
+                        tag: `chat-message-${detail.message.message_id}`,
+                        conversationId: detail.conversationId,
+                        conversationType: detail.conversationType,
+                        messageId: detail.message.message_id,
+                        unreadCount: detail.unreadCount,
+                        silent: true,
+                        avatarDataUrl: avatarDataUrl ?? undefined,
+                    });
+                });
         };
 
         window.addEventListener(CHAT_MESSAGE_NOTIFICATION_EVENT, handleNewMessage);
