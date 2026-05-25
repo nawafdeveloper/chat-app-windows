@@ -444,7 +444,7 @@ export default function ChatRoomContent() {
         try {
             setOlderMessagesLoading(selectedChatId, true);
             const response = await fetch(
-                `https://halabakk-web.nawaf-alhasosah.workers.dev/api/messages?chatRoomId=${encodeURIComponent(selectedChatId)}&limit=${PAGE_SIZE}&beforeCreatedAt=${encodeURIComponent(oldestMessage.created_at.toISOString())}`
+                `https://web.yahla.org/api/messages?chatRoomId=${encodeURIComponent(selectedChatId)}&limit=${PAGE_SIZE}&beforeCreatedAt=${encodeURIComponent(oldestMessage.created_at.toISOString())}`
             );
 
             if (!response.ok) {
@@ -526,7 +526,7 @@ export default function ChatRoomContent() {
                 try {
                     setOlderMessagesLoading(selectedChatId, true);
                     const response = await fetch(
-                        `https://halabakk-web.nawaf-alhasosah.workers.dev/api/messages?chatRoomId=${encodeURIComponent(selectedChatId)}&limit=${PAGE_SIZE}&beforeCreatedAt=${encodeURIComponent(oldestMessage.created_at.toISOString())}`,
+                        `https://web.yahla.org/api/messages?chatRoomId=${encodeURIComponent(selectedChatId)}&limit=${PAGE_SIZE}&beforeCreatedAt=${encodeURIComponent(oldestMessage.created_at.toISOString())}`,
                         { cache: "no-store" }
                     );
 
@@ -836,7 +836,7 @@ export default function ChatRoomContent() {
 
         setPendingChatAction("exit");
         try {
-            const response = await fetch(`https://halabakk-web.nawaf-alhasosah.workers.dev/api/chats/${encodeURIComponent(selectedChatId)}`, {
+            const response = await fetch(`https://web.yahla.org/api/chats/${encodeURIComponent(selectedChatId)}`, {
                 method: "DELETE",
             });
 

@@ -171,7 +171,7 @@ export async function uploadEncryptedMessageMedia(
         );
     }
 
-    const response = await fetch("https://halabakk-web.nawaf-alhasosah.workers.dev/api/message-media", {
+    const response = await fetch("https://web.yahla.org/api/message-media", {
         method: "POST",
         credentials: "include",
         headers: buildMediaDebugHeaders(debugTraceId),
@@ -257,7 +257,7 @@ export async function fetchAndDecryptMessageMedia(
         sessionKeys.privateKey
     );
 
-    const mediaResponse = await fetch(`https://halabakk-web.nawaf-alhasosah.workers.dev/api/message-media/${parsed.objectKey}`, {
+    const mediaResponse = await fetch(`https://web.yahla.org/api/message-media/${parsed.objectKey}`, {
         credentials: "include",
     });
     if (!mediaResponse.ok) {

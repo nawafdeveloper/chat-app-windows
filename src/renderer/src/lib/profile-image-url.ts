@@ -1,4 +1,4 @@
-export const PROFILE_IMAGE_API_PATH = "https://halabakk-web.nawaf-alhasosah.workers.dev/api/profile-image";
+export const PROFILE_IMAGE_API_PATH = "https://web.yahla.org/api/profile-image";
 const PROFILE_IMAGE_API_PATHNAME = new URL(PROFILE_IMAGE_API_PATH).pathname;
 
 // ---------------------------------------------------------------------------
@@ -21,7 +21,7 @@ export async function buildProfileImageObjectKey(userId: string): Promise<string
 
 /**
  * Build the profile image URL.
- * Format: `https://halabakk-web.nawaf-alhasosah.workers.dev/api/profile-image/<objectKey>`
+ * Format: `https://web.yahla.org/api/profile-image/<objectKey>`
  */
 export function buildProfileImageUrl(objectKey: string): string {
     return `${PROFILE_IMAGE_API_PATH}/${objectKey}`;

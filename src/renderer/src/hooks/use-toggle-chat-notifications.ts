@@ -24,7 +24,7 @@ export function useToggleChatNotifications() {
             setIsToggling(true);
 
             try {
-                const response = await fetch("https://halabakk-web.nawaf-alhasosah.workers.dev/api/chats", {
+                const response = await fetch("https://web.yahla.org/api/chats", {
                     method: "PATCH",
                     headers: {
                         "Content-Type": "application/json",

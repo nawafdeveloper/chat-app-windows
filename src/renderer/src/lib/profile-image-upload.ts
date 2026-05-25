@@ -121,7 +121,7 @@ export async function uploadEncryptedProfileImage(
     formData.append("iv", iv);
     formData.append("recipientKeys", JSON.stringify(recipientKeys));
 
-    const response = await fetch("https://halabakk-web.nawaf-alhasosah.workers.dev/api/profile-image", {
+    const response = await fetch("https://web.yahla.org/api/profile-image", {
         method: "POST",
         credentials: "include",
         body: formData,
@@ -237,7 +237,7 @@ export async function fetchAndDecryptProfileImage(objectKey: string): Promise<Bl
         throw new Error("Failed to decrypt profile image key.");
     }
 
-    const imageResponse = await fetch(`https://halabakk-web.nawaf-alhasosah.workers.dev/api/profile-image/${objectKey}`, {
+    const imageResponse = await fetch(`https://web.yahla.org/api/profile-image/${objectKey}`, {
         credentials: "include",
     });
     if (!imageResponse.ok) {

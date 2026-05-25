@@ -126,7 +126,7 @@ export function useCreateGroupChat() {
                 GROUP_CREATED_PREVIEW,
                 recipients
             );
-            const response = await fetch("https://halabakk-web.nawaf-alhasosah.workers.dev/api/chats", {
+            const response = await fetch("https://web.yahla.org/api/chats", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

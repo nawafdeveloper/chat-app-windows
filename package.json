@@ -8,7 +8,7 @@
     "start": "electron-vite dev",
     "build": "npm run typecheck && electron-vite build",
     "dist": "npm run dist:win",
-    "dist:win": "set \"PATH=C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;%PATH%\" && set CSC_IDENTITY_AUTO_DISCOVERY=false && npm run build && electron-builder --win nsis portable --publish never",
+    "dist:win": "set \"PATH=C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;%PATH%\" && set CSC_IDENTITY_AUTO_DISCOVERY=false && npm run build && electron-builder --win appx --publish never",
     "preview": "electron-vite preview",
     "typecheck": "tsc -b",
     "check": "npm run typecheck",
@@ -72,27 +72,22 @@
       "icon": "build/icon.ico",
       "target": [
         {
-          "target": "nsis",
-          "arch": [
-            "x64"
-          ]
-        },
-        {
-          "target": "portable",
+          "target": "appx",
           "arch": [
             "x64"
           ]
         }
       ]
     },
-    "nsis": {
-      "artifactName": "${productName}-Setup-${version}-${arch}.${ext}",
-      "oneClick": false,
-      "perMachine": false,
-      "allowToChangeInstallationDirectory": true
-    },
-    "portable": {
-      "artifactName": "${productName}-Portable-${version}-${arch}.${ext}"
+    "appx": {
+      "artifactName": "${productName}-${version}.${ext}",
+      "publisherDisplayName": "YaHla",
+      "identityName": "YaHla.YaHla",
+      "publisher": "CN=E74A2C33-7C93-4629-AB33-D7CE624E0278",
+      "applicationId": "YaHla",
+      "backgroundColor": "#ffffff",
+      "minVersion": "10.0.17763.0",
+      "maxVersionTested": "10.0.19041.0"
     }
   }
 }

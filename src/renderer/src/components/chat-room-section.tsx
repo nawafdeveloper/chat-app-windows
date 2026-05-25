@@ -73,7 +73,7 @@ export default function ChatRoomSection() {
 
         const fetchPinnedMessages = async () => {
             const response = await fetch(
-                `https://halabakk-web.nawaf-alhasosah.workers.dev/api/messages?chatRoomId=${encodeURIComponent(selectedChatId)}&limit=100&pinnedOnly=true`,
+                `https://web.yahla.org/api/messages?chatRoomId=${encodeURIComponent(selectedChatId)}&limit=100&pinnedOnly=true`,
                 { cache: "no-store" }
             );
 

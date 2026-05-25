@@ -293,7 +293,7 @@ export default function DetailedLargeSidebarContent({
         setGroupError(null);
 
         try {
-            const response = await fetch(`https://halabakk-web.nawaf-alhasosah.workers.dev/api/chats/${encodeURIComponent(chatId)}`, {
+            const response = await fetch(`https://web.yahla.org/api/chats/${encodeURIComponent(chatId)}`, {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ displayName: groupNameDraft.trim() }),
@@ -393,7 +393,7 @@ export default function DetailedLargeSidebarContent({
 
         try {
             const upload = await uploadEncryptedMessageMedia(file, recipients, null);
-            const response = await fetch(`https://halabakk-web.nawaf-alhasosah.workers.dev/api/chats/${encodeURIComponent(chatId)}`, {
+            const response = await fetch(`https://web.yahla.org/api/chats/${encodeURIComponent(chatId)}`, {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ avatar: upload.mediaUrl }),
@@ -436,7 +436,7 @@ export default function DetailedLargeSidebarContent({
         setGroupError(null);
 
         try {
-            const response = await fetch(`https://halabakk-web.nawaf-alhasosah.workers.dev/api/chats/${encodeURIComponent(chatId)}/members`, {
+            const response = await fetch(`https://web.yahla.org/api/chats/${encodeURIComponent(chatId)}/members`, {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ memberUserId: member.user_id, isAdmin }),
@@ -466,7 +466,7 @@ export default function DetailedLargeSidebarContent({
         setGroupError(null);
 
         try {
-            const response = await fetch(`https://halabakk-web.nawaf-alhasosah.workers.dev/api/chats/${encodeURIComponent(chatId)}/members`, {
+            const response = await fetch(`https://web.yahla.org/api/chats/${encodeURIComponent(chatId)}/members`, {
                 method: "DELETE",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ memberUserId: member.user_id }),
@@ -512,7 +512,7 @@ export default function DetailedLargeSidebarContent({
         setGroupError(null);
 
         try {
-            const response = await fetch(`https://halabakk-web.nawaf-alhasosah.workers.dev/api/chats/${encodeURIComponent(chatId)}`, {
+            const response = await fetch(`https://web.yahla.org/api/chats/${encodeURIComponent(chatId)}`, {
                 method: "DELETE",
             });
 
@@ -612,7 +612,7 @@ export default function DetailedLargeSidebarContent({
                 "Added to group",
                 [...recipientsByUserId.values()]
             );
-            const response = await fetch(`https://halabakk-web.nawaf-alhasosah.workers.dev/api/chats/${encodeURIComponent(chatId)}/members`, {
+            const response = await fetch(`https://web.yahla.org/api/chats/${encodeURIComponent(chatId)}/members`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({

@@ -1,4 +1,4 @@
-export const AUTH_BASE_URL = "https://halabakk-web.nawaf-alhasosah.workers.dev/";
+export const AUTH_BASE_URL = "https://web.yahla.org/";
 export const AUTH_PROTOCOL_SCHEME = "com.yahla.windows";
 export const AUTH_FETCH_CHANNEL = "yahla:auth-fetch";
 export const AUTH_FLOW_GET_CHANNEL = "yahla:auth-flow:get";

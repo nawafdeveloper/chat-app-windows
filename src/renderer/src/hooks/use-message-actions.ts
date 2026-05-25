@@ -65,7 +65,7 @@ export function useMessageActions() {
             }));
 
             try {
-                const response = await fetch("https://halabakk-web.nawaf-alhasosah.workers.dev/api/messages", {
+                const response = await fetch("https://web.yahla.org/api/messages", {
                     method: "PATCH",
                     headers: {
                         "Content-Type": "application/json",

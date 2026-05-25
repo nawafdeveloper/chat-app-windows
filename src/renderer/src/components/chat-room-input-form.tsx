@@ -53,7 +53,7 @@ async function fetchOpenGraphPreview(
     signal?: AbortSignal
 ): Promise<OpenGraphData | null> {
     const response = await fetch(
-        `https://halabakk-web.nawaf-alhasosah.workers.dev/api/open-graph?url=${encodeURIComponent(url)}`,
+        `https://web.yahla.org/api/open-graph?url=${encodeURIComponent(url)}`,
         {
             cache: "no-store",
             signal,
