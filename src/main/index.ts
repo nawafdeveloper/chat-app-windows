@@ -237,8 +237,8 @@ function createMainWindow(): void {
     show: false,
     title: "Yahla",
     frame: false,
-    transparent: true,
-    backgroundColor: "#00000000",
+    transparent: false,
+    backgroundColor: "#161717",
     autoHideMenuBar: true,
     webPreferences: {
       preload: join(__dirname, "../preload/index.js"),
