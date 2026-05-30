@@ -11,9 +11,11 @@ import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { registerAuthIpc } from "./auth-ipc";
 import {
+  NOTIFICATION_BADGE_UPDATE_CHANNEL,
   NOTIFICATION_CLICKED_CHANNEL,
   NOTIFICATION_REPLIED_CHANNEL,
   NOTIFICATION_SHOW_CHANNEL,
+  type NativeNotificationBadgePayload,
   type NativeNotificationPayload,
 } from "../shared/notification-ipc";
 import {
@@ -28,6 +30,7 @@ const isDev = !app.isPackaged;
 const APP_NAME = "Yahla";
 const APP_USER_MODEL_ID = "com.yahla.windows";
 const activeNotifications = new Set<Notification>();
+let currentTaskbarBadgeCount = 0;
 
 app.setName(APP_NAME);
 
@@ -119,6 +122,71 @@ function resolveNotificationIcon(
   return getAppIconPath();
 }
 
+function createTaskbarBadgeFallbackIcon(): Electron.NativeImage {
+  const size = 16;
+  const center = size / 2;
+  const pixels = Buffer.alloc(size * size * 4);
+
+  for (let y = 0; y < size; y++) {
+    for (let x = 0; x < size; x++) {
+      const dx = x + 0.5 - center;
+      const dy = y + 0.5 - center;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+
+      if (distance > 3.4) {
+        continue;
+      }
+
+      const index = (y * size + x) * 4;
+      pixels[index] = 0;
+      pixels[index + 1] = 0;
+      pixels[index + 2] = 0;
+      pixels[index + 3] = 255;
+    }
+  }
+
+  return nativeImage.createFromBitmap(pixels, { width: size, height: size });
+}
+
+function createTaskbarBadgeIcon(count: number): Electron.NativeImage {
+  void count;
+
+  const svg = [
+    '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">',
+    '<circle cx="8" cy="8" r="3.4" fill="#000000"/>',
+    "</svg>",
+  ].join("");
+  const icon = nativeImage.createFromDataURL(
+    `data:image/svg+xml;base64,${Buffer.from(svg).toString("base64")}`
+  );
+
+  return icon.isEmpty() ? createTaskbarBadgeFallbackIcon() : icon;
+}
+
+function updateTaskbarBadge(count: number): void {
+  const normalizedCount = Number.isFinite(count)
+    ? Math.max(0, Math.floor(count))
+    : 0;
+  currentTaskbarBadgeCount = normalizedCount;
+
+  if (process.platform !== "win32") {
+    return;
+  }
+
+  const overlay =
+    normalizedCount > 0 ? createTaskbarBadgeIcon(normalizedCount) : null;
+  const description =
+    normalizedCount > 0
+      ? `${normalizedCount} unread message${normalizedCount === 1 ? "" : "s"}`
+      : "No unread messages";
+
+  for (const window of BrowserWindow.getAllWindows()) {
+    if (!window.isDestroyed()) {
+      window.setOverlayIcon(overlay, description);
+    }
+  }
+}
+
 function registerWindowIpc(): void {
   ipcMain.handle(WINDOW_MINIMIZE_CHANNEL, (event) => {
     getWindowFromSender(event)?.minimize();
@@ -151,6 +219,14 @@ function registerWindowIpc(): void {
 
 function registerNotificationIpc(): void {
   ipcMain.handle(
+    NOTIFICATION_BADGE_UPDATE_CHANNEL,
+    (_event, payload: NativeNotificationBadgePayload) => {
+      updateTaskbarBadge(payload?.count ?? 0);
+      return true;
+    }
+  );
+
+  ipcMain.handle(
     NOTIFICATION_SHOW_CHANNEL,
     (event, payload: NativeNotificationPayload) => {
       if (!Notification.isSupported() || !payload?.title?.trim()) {
@@ -166,13 +242,8 @@ function registerNotificationIpc(): void {
         id: payload.id ?? payload.messageId ?? payload.tag,
         icon,
         silent: payload.silent,
-        actions: [
-          {
-            type: "button" as Electron.NotificationAction["type"],
-            text: "Reply…",
-          },
-        ],
-        replyPlaceholder: "Write a reply…",
+        hasReply: true,
+        replyPlaceholder: "Write a reply...",
       });
 
       const cleanupNotification = (): void => {
@@ -202,10 +273,10 @@ function registerNotificationIpc(): void {
         }
       });
 
-      notification.on("action", (_event, index, value) => {
-        const replyText = String(value ?? "").trim();
+      notification.on("reply", (details, reply) => {
+        const replyText = String(details.reply ?? reply ?? "").trim();
 
-        if (index !== 0 || !replyText) {
+        if (!replyText) {
           return;
         }
 
@@ -270,6 +341,7 @@ function createMainWindow(): void {
     mainWindow.maximize();
     mainWindow.show();
     sendMaximizedState();
+    updateTaskbarBadge(currentTaskbarBadgeCount);
   });
   mainWindow.webContents.once("did-finish-load", sendMaximizedState);
 

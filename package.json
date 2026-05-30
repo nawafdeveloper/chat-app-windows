@@ -1,6 +1,6 @@
 {
   "name": "yahla-windows",
-  "version": "1.0.0",
+  "version": "1.0.3",
   "description": "Electron desktop app starter for Yahla on Windows.",
   "main": "out/main/index.js",
   "scripts": {
@@ -8,7 +8,7 @@
     "start": "electron-vite dev",
     "build": "npm run typecheck && electron-vite build",
     "dist": "npm run dist:win",
-    "dist:win": "set \"PATH=C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;%PATH%\" && set CSC_IDENTITY_AUTO_DISCOVERY=false && npm run build && electron-builder --win appx --publish never",
+    "dist:win": "set \"PATH=C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;%PATH%\" && set CSC_IDENTITY_AUTO_DISCOVERY=false && npm run build && electron-builder --win appx nsis --publish never",
     "preview": "electron-vite preview",
     "typecheck": "tsc -b",
     "check": "npm run typecheck",
@@ -76,8 +76,22 @@
           "arch": [
             "x64"
           ]
+        },
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
         }
       ]
+    },
+    "nsis": {
+      "artifactName": "${productName}-Installer.${ext}",
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Yahla"
     },
     "appx": {
       "artifactName": "${productName}-${version}.${ext}",

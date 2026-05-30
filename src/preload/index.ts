@@ -19,9 +19,11 @@ import {
   WINDOW_TOGGLE_MAXIMIZE_CHANNEL,
 } from "../shared/window-ipc";
 import {
+  NOTIFICATION_BADGE_UPDATE_CHANNEL,
   NOTIFICATION_CLICKED_CHANNEL,
   NOTIFICATION_REPLIED_CHANNEL,
   NOTIFICATION_SHOW_CHANNEL,
+  type NativeNotificationBadgePayload,
   type NativeNotificationClickPayload,
   type NativeNotificationPayload,
   type NativeNotificationReplyPayload,
@@ -46,6 +48,9 @@ type ElectronAPI = {
   isWindowMaximized: () => Promise<boolean>;
   onWindowMaximizedChange: (callback: (isMaximized: boolean) => void) => () => void;
   showNativeNotification: (payload: NativeNotificationPayload) => Promise<boolean>;
+  setNativeNotificationBadge: (
+    payload: NativeNotificationBadgePayload
+  ) => Promise<boolean>;
   onNativeNotificationClick: (
     callback: (payload: NativeNotificationClickPayload) => void
   ) => () => void;
@@ -84,6 +89,8 @@ const electronAPI: ElectronAPI = {
   },
   showNativeNotification: (payload) =>
     ipcRenderer.invoke(NOTIFICATION_SHOW_CHANNEL, payload),
+  setNativeNotificationBadge: (payload) =>
+    ipcRenderer.invoke(NOTIFICATION_BADGE_UPDATE_CHANNEL, payload),
   onNativeNotificationClick: (callback) => {
     const listener = (
       _event: Electron.IpcRendererEvent,

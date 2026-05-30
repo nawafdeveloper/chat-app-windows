@@ -1,6 +1,7 @@
 export const NOTIFICATION_SHOW_CHANNEL = "yahla:notification:show";
 export const NOTIFICATION_CLICKED_CHANNEL = "yahla:notification:clicked";
 export const NOTIFICATION_REPLIED_CHANNEL = "yahla:notification:replied";
+export const NOTIFICATION_BADGE_UPDATE_CHANNEL = "yahla:notification-badge:update";
 
 export type NativeNotificationPayload = {
   title: string;
@@ -22,4 +23,8 @@ export type NativeNotificationClickPayload = Pick<
 
 export type NativeNotificationReplyPayload = NativeNotificationClickPayload & {
   replyText: string;
+};
+
+export type NativeNotificationBadgePayload = {
+  count: number;
 };

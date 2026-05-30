@@ -8,6 +8,8 @@ import {
 import { resolveAvatarDataUrl } from "../lib/resolve-avatar-data-url";
 import { publicAssetSrc } from "../lib/public-assets";
 import { useActiveChatStore } from "../store/use-active-chat-store";
+import { createReplyMessageFromMessage } from "../lib/message-reply";
+import { useSendChatMessage } from "../hooks/use-send-chat-message";
 
 type NotificationUser = {
     id?: string;
@@ -58,13 +60,31 @@ function getNotificationBody(detail: ChatMessageNotificationEventDetail) {
 export default function Notification() {
     const { data: session } = authClient.useSession();
     const setSelectedChatId = useActiveChatStore((state) => state.setSelectedChatId);
+    const totalUnread = useActiveChatStore((state) =>
+        state.chats.reduce(
+            (total, chat) => total + Math.max(0, chat.unreaded_messages_length),
+            0
+        )
+    );
+    const { sendMessage } = useSendChatMessage();
     const sessionUserRef = useRef<NotificationUser | null>(null);
+    const sendMessageRef = useRef(sendMessage);
     const shownMessageIdsRef = useRef<Set<string>>(new Set());
     const notificationSoundRef = useRef<HTMLAudioElement | null>(null);
 
     useEffect(() => {
         sessionUserRef.current = (session?.user as NotificationUser | undefined) ?? null;
     }, [session]);
+
+    useEffect(() => {
+        sendMessageRef.current = sendMessage;
+    }, [sendMessage]);
+
+    useEffect(() => {
+        void window.electronAPI?.setNativeNotificationBadge({
+            count: totalUnread,
+        });
+    }, [totalUnread]);
 
     useEffect(() => {
         const audio = new Audio(NOTIFICATION_SOUND_SRC);
@@ -87,12 +107,30 @@ export default function Notification() {
 
     useEffect(() => {
         return window.electronAPI?.onNativeNotificationReply((payload) => {
-            if (!payload.conversationId || !payload.replyText) {
+            const conversationId = payload.conversationId;
+            const replyText = payload.replyText?.trim();
+
+            if (!conversationId || !replyText) {
                 return;
             }
 
-            // TODO: wire to your sendMessage action
-            // sendMessage(payload.conversationId, payload.replyText);
+            const sourceMessage = payload.messageId
+                ? useActiveChatStore
+                      .getState()
+                      .messagesByChatId[conversationId]?.find(
+                          (message) => message.message_id === payload.messageId
+                      ) ?? null
+                : null;
+
+            void sendMessageRef.current({
+                text: replyText,
+                chatId: conversationId,
+                clearDraft: false,
+                clearReplyDraftOnSend: false,
+                replyMessage: sourceMessage
+                    ? createReplyMessageFromMessage(sourceMessage)
+                    : null,
+            });
         });
     }, []);
 

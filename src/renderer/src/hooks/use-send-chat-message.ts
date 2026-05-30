@@ -254,6 +254,7 @@ export function useSendChatMessage() {
         encryptedChatPreview = null,
         chatPreviewRecipientKeys = null,
         isForwardMessage = false,
+        clearReplyDraftOnSend = true,
     }: {
         chatId: string;
         currentUserId: string;
@@ -269,6 +270,7 @@ export function useSendChatMessage() {
         encryptedChatPreview?: EncryptedContentEnvelope | null;
         chatPreviewRecipientKeys?: RecipientEncryptedAesKeyInput[] | null;
         isForwardMessage?: boolean;
+        clearReplyDraftOnSend?: boolean;
     }) => {
         const senderNickname = session?.user.name ?? currentPhone;
         const senderAvatarUrl = session?.user.image ?? null;
@@ -315,7 +317,11 @@ export function useSendChatMessage() {
             setDraft(chatId, "");
         }
 
-        if (!existingMessageId && optimisticMessage.reply_message) {
+        if (
+            clearReplyDraftOnSend &&
+            !existingMessageId &&
+            optimisticMessage.reply_message
+        ) {
             clearReplyDraft(chatId);
         }
 
@@ -485,6 +491,8 @@ export function useSendChatMessage() {
         existingMessageId,
         openGraphData,
         isForwardMessage = false,
+        replyMessage,
+        clearReplyDraftOnSend = true,
     }: {
         text: string;
         chatId?: string | null;
@@ -492,6 +500,8 @@ export function useSendChatMessage() {
         existingMessageId?: string;
         openGraphData?: Message["open_graph_data"];
         isForwardMessage?: boolean;
+        replyMessage?: Message["reply_message"];
+        clearReplyDraftOnSend?: boolean;
     }) => {
         const trimmed = text.trim();
         const currentUserId = session?.user.id;
@@ -514,12 +524,14 @@ export function useSendChatMessage() {
         }
 
         const messageId = existingMessageId ?? crypto.randomUUID();
-        const replyMessage = isForwardMessage
+        const resolvedReplyMessage = isForwardMessage
             ? null
-            : resolveReplyMessageForSend({
-                  chatId,
-                  existingMessageId,
-              });
+            : replyMessage !== undefined
+              ? replyMessage
+              : resolveReplyMessageForSend({
+                    chatId,
+                    existingMessageId,
+                });
         const resolvedOpenGraphData = resolveOpenGraphDataForSend({
             chatId,
             existingMessageId,
@@ -530,7 +542,7 @@ export function useSendChatMessage() {
             chatId,
             senderUserId: currentUserId,
             plaintext: trimmed,
-            replyMessage,
+            replyMessage: resolvedReplyMessage,
             openGraphData: resolvedOpenGraphData,
             isForwarded: isForwardMessage,
         });
@@ -563,6 +575,7 @@ export function useSendChatMessage() {
                 encryptedChatPreview: encryptedPreview.encryptedContent,
                 chatPreviewRecipientKeys: encryptedPreview.recipientEncryptionKeys,
                 isForwardMessage,
+                clearReplyDraftOnSend,
             });
 
             return true;

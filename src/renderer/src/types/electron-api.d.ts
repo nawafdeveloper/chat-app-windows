@@ -6,6 +6,7 @@ import type {
   VerifyPhoneOtpRequest,
 } from "../../../shared/auth-ipc";
 import type {
+  NativeNotificationBadgePayload,
   NativeNotificationClickPayload,
   NativeNotificationPayload,
   NativeNotificationReplyPayload,
@@ -31,6 +32,9 @@ declare global {
     isWindowMaximized: () => Promise<boolean>;
     onWindowMaximizedChange: (callback: (isMaximized: boolean) => void) => () => void;
     showNativeNotification: (payload: NativeNotificationPayload) => Promise<boolean>;
+    setNativeNotificationBadge: (
+      payload: NativeNotificationBadgePayload
+    ) => Promise<boolean>;
     onNativeNotificationClick: (
       callback: (payload: NativeNotificationClickPayload) => void
     ) => () => void;
