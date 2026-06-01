@@ -9,6 +9,7 @@ import {
 } from "electron";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
+import sharp from "sharp";
 import { registerAuthIpc } from "./auth-ipc";
 import {
   NOTIFICATION_BADGE_UPDATE_CHANNEL,
@@ -29,25 +30,16 @@ import {
 const isDev = !app.isPackaged;
 const APP_NAME = "Yahla";
 const APP_USER_MODEL_ID = "com.yahla.windows";
+const TASKBAR_BADGE_BACKGROUND = "#4CC2FF";
+const TASKBAR_BADGE_TEXT = "#000000";
 const activeNotifications = new Set<Notification>();
+const taskbarBadgeIconCache = new Map<number, Electron.NativeImage>();
 let currentTaskbarBadgeCount = 0;
+let taskbarBadgeUpdateId = 0;
 
 app.setName(APP_NAME);
 
-function shouldUseWindowsAppUserModelId(): boolean {
-  if (process.platform !== "win32" || !app.isPackaged) {
-    return false;
-  }
-
-  const executablePath = process.execPath.toLowerCase();
-  return (
-    !process.env.PORTABLE_EXECUTABLE_FILE &&
-    !executablePath.includes("\\temp\\") &&
-    !executablePath.includes("\\release\\win-unpacked\\")
-  );
-}
-
-if (shouldUseWindowsAppUserModelId()) {
+if (process.platform === "win32") {
   app.setAppUserModelId(APP_USER_MODEL_ID);
 }
 
@@ -71,50 +63,57 @@ function getWindowFromSender(
   return BrowserWindow.fromWebContents(event.sender);
 }
 
-function makeCircularIcon(image: Electron.NativeImage): Electron.NativeImage {
-  const size = 64;
-  const { width, height } = image.getSize();
+function getBufferFromDataUrl(dataUrl: string): Buffer | null {
+  const commaIndex = dataUrl.indexOf(",");
 
-  // Resize to square first
-  const resized = image.resize({
-    width: size,
-    height: size,
-    quality: "best",
-  });
-
-  const pixels = resized.toBitmap(); // raw BGRA buffer
-
-  // Paint pixels outside the circle as transparent
-  for (let y = 0; y < size; y++) {
-    for (let x = 0; x < size; x++) {
-      const dx = x - size / 2;
-      const dy = y - size / 2;
-      const isOutside = dx * dx + dy * dy > (size / 2) * (size / 2);
-
-      if (isOutside) {
-        const idx = (y * size + x) * 4;
-        pixels[idx] = 0;       // B
-        pixels[idx + 1] = 0;   // G
-        pixels[idx + 2] = 0;   // R
-        pixels[idx + 3] = 0;   // A (transparent)
-      }
-    }
+  if (commaIndex === -1) {
+    return null;
   }
 
-  // suppress unused variable warning
-  void width;
-  void height;
+  const metadata = dataUrl.slice(0, commaIndex).toLowerCase();
+  const data = dataUrl.slice(commaIndex + 1);
 
-  return nativeImage.createFromBitmap(pixels, { width: size, height: size });
+  return metadata.includes(";base64")
+    ? Buffer.from(data, "base64")
+    : Buffer.from(decodeURIComponent(data), "utf8");
 }
 
-function resolveNotificationIcon(
+async function createCircularAvatarIcon(
+  avatarDataUrl: string
+): Promise<Electron.NativeImage | null> {
+  const size = 256;
+  const inputBuffer = getBufferFromDataUrl(avatarDataUrl);
+
+  if (!inputBuffer) {
+    return null;
+  }
+
+  const circleMask = Buffer.from(
+    `<svg width="${size}" height="${size}" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="${size / 2}" cy="${size / 2}" r="${size / 2}" fill="white"/>
+    </svg>`
+  );
+
+  const pngBuffer = await sharp(inputBuffer)
+    .resize(size, size, { fit: "cover", position: "center" })
+    .composite([{ input: circleMask, blend: "dest-in" }])
+    .png()
+    .toBuffer();
+  const image = nativeImage.createFromBuffer(pngBuffer);
+
+  return image.isEmpty() ? null : image;
+}
+
+async function resolveNotificationIcon(
   avatarDataUrl?: string
-): Electron.NativeImage | string | undefined {
+): Promise<Electron.NativeImage | string | undefined> {
   if (avatarDataUrl?.startsWith("data:image/")) {
     try {
-      const image = nativeImage.createFromDataURL(avatarDataUrl);
-      return makeCircularIcon(image);
+      const image = await createCircularAvatarIcon(avatarDataUrl);
+
+      if (image) {
+        return image;
+      }
     } catch {
       // fall through to app icon
     }
@@ -122,59 +121,104 @@ function resolveNotificationIcon(
   return getAppIconPath();
 }
 
-function createTaskbarBadgeFallbackIcon(): Electron.NativeImage {
-  const size = 16;
-  const center = size / 2;
-  const pixels = Buffer.alloc(size * size * 4);
+function getTaskbarBadgeLabel(count: number): string {
+  return String(Math.max(0, Math.floor(count)));
+}
 
-  for (let y = 0; y < size; y++) {
-    for (let x = 0; x < size; x++) {
-      const dx = x + 0.5 - center;
-      const dy = y + 0.5 - center;
-      const distance = Math.sqrt(dx * dx + dy * dy);
-
-      if (distance > 3.4) {
-        continue;
-      }
-
-      const index = (y * size + x) * 4;
-      pixels[index] = 0;
-      pixels[index + 1] = 0;
-      pixels[index + 2] = 0;
-      pixels[index + 3] = 255;
-    }
+function getTaskbarBadgeFontSize(label: string): number {
+  if (label.length <= 1) {
+    return 42;
   }
 
-  return nativeImage.createFromBitmap(pixels, { width: size, height: size });
+  if (label.length === 2) {
+    return 34;
+  }
+
+  if (label.length === 3) {
+    return 27;
+  }
+
+  if (label.length === 4) {
+    return 21;
+  }
+
+  return Math.max(12, 78 / label.length);
 }
 
-function createTaskbarBadgeIcon(count: number): Electron.NativeImage {
-  void count;
+function createTaskbarBadgeSvg(count: number): string {
+  const label = getTaskbarBadgeLabel(count);
+  const fontSize = getTaskbarBadgeFontSize(label);
+  const fitAttributes =
+    label.length > 2
+      ? ' textLength="53" lengthAdjust="spacingAndGlyphs"'
+      : "";
 
-  const svg = [
-    '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">',
-    '<circle cx="8" cy="8" r="3.4" fill="#000000"/>',
+  return [
+    '<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">',
+    `<rect x="2" y="6" width="60" height="52" rx="26" fill="${TASKBAR_BADGE_BACKGROUND}"/>`,
+    `<text x="32" y="34" text-anchor="middle" dominant-baseline="middle" font-family="Segoe UI, Arial, sans-serif" font-size="${fontSize}" font-weight="700" font-variant-numeric="tabular-nums" fill="${TASKBAR_BADGE_TEXT}"${fitAttributes}>${label}</text>`,
     "</svg>",
   ].join("");
-  const icon = nativeImage.createFromDataURL(
-    `data:image/svg+xml;base64,${Buffer.from(svg).toString("base64")}`
-  );
-
-  return icon.isEmpty() ? createTaskbarBadgeFallbackIcon() : icon;
 }
 
-function updateTaskbarBadge(count: number): void {
+async function createTaskbarBadgePng(
+  count: number,
+  size: number
+): Promise<Buffer> {
+  return sharp(Buffer.from(createTaskbarBadgeSvg(count)))
+    .resize(size, size, { fit: "fill" })
+    .png()
+    .toBuffer();
+}
+
+async function createTaskbarBadgeIcon(
+  count: number
+): Promise<Electron.NativeImage | null> {
+  const cachedIcon = taskbarBadgeIconCache.get(count);
+
+  if (cachedIcon) {
+    return cachedIcon;
+  }
+
+  const [standardPng, highDpiPng] = await Promise.all([
+    createTaskbarBadgePng(count, 16),
+    createTaskbarBadgePng(count, 32),
+  ]);
+  const icon = nativeImage.createFromBuffer(standardPng);
+
+  icon.addRepresentation({
+    scaleFactor: 2,
+    dataURL: `data:image/png;base64,${highDpiPng.toString("base64")}`,
+  });
+
+  if (icon.isEmpty()) {
+    return null;
+  }
+
+  taskbarBadgeIconCache.set(count, icon);
+  return icon;
+}
+
+async function updateTaskbarBadge(count: number): Promise<void> {
   const normalizedCount = Number.isFinite(count)
     ? Math.max(0, Math.floor(count))
     : 0;
   currentTaskbarBadgeCount = normalizedCount;
+  const updateId = ++taskbarBadgeUpdateId;
 
   if (process.platform !== "win32") {
     return;
   }
 
   const overlay =
-    normalizedCount > 0 ? createTaskbarBadgeIcon(normalizedCount) : null;
+    normalizedCount > 0
+      ? await createTaskbarBadgeIcon(normalizedCount)
+      : null;
+
+  if (updateId !== taskbarBadgeUpdateId) {
+    return;
+  }
+
   const description =
     normalizedCount > 0
       ? `${normalizedCount} unread message${normalizedCount === 1 ? "" : "s"}`
@@ -220,21 +264,21 @@ function registerWindowIpc(): void {
 function registerNotificationIpc(): void {
   ipcMain.handle(
     NOTIFICATION_BADGE_UPDATE_CHANNEL,
-    (_event, payload: NativeNotificationBadgePayload) => {
-      updateTaskbarBadge(payload?.count ?? 0);
+    async (_event, payload: NativeNotificationBadgePayload) => {
+      await updateTaskbarBadge(payload?.count ?? 0);
       return true;
     }
   );
 
   ipcMain.handle(
     NOTIFICATION_SHOW_CHANNEL,
-    (event, payload: NativeNotificationPayload) => {
+    async (event, payload: NativeNotificationPayload) => {
       if (!Notification.isSupported() || !payload?.title?.trim()) {
         return false;
       }
 
       const window = getWindowFromSender(event);
-      const icon = resolveNotificationIcon(payload.avatarDataUrl);
+      const icon = await resolveNotificationIcon(payload.avatarDataUrl);
 
       const notification = new Notification({
         title: payload.title,
@@ -300,6 +344,7 @@ function registerNotificationIpc(): void {
 }
 
 function createMainWindow(): void {
+  const appIconPath = getAppIconPath();
   const mainWindow = new BrowserWindow({
     width: 1200,
     height: 800,
@@ -311,6 +356,7 @@ function createMainWindow(): void {
     transparent: false,
     backgroundColor: "#161717",
     autoHideMenuBar: true,
+    ...(appIconPath ? { icon: appIconPath } : {}),
     webPreferences: {
       preload: join(__dirname, "../preload/index.js"),
       contextIsolation: true,
@@ -341,7 +387,13 @@ function createMainWindow(): void {
     mainWindow.maximize();
     mainWindow.show();
     sendMaximizedState();
-    updateTaskbarBadge(currentTaskbarBadgeCount);
+    void updateTaskbarBadge(currentTaskbarBadgeCount);
+  });
+  mainWindow.on("show", () => {
+    void updateTaskbarBadge(currentTaskbarBadgeCount);
+  });
+  mainWindow.on("restore", () => {
+    void updateTaskbarBadge(currentTaskbarBadgeCount);
   });
   mainWindow.webContents.once("did-finish-load", sendMaximizedState);
 

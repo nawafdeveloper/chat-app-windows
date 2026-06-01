@@ -1,7 +1,7 @@
 {
   "name": "yahla-windows",
-  "version": "1.0.3",
-  "description": "Electron desktop app starter for Yahla on Windows.",
+  "version": "1.0.5",
+  "description": "YaHla Private messaging app with multi platforms.",
   "main": "out/main/index.js",
   "scripts": {
     "dev": "electron-vite dev",
@@ -9,6 +9,7 @@
     "build": "npm run typecheck && electron-vite build",
     "dist": "npm run dist:win",
     "dist:win": "set \"PATH=C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;%PATH%\" && set CSC_IDENTITY_AUTO_DISCOVERY=false && npm run build && electron-builder --win appx nsis --publish never",
+    "dist:win:installer": "set \"PATH=C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;%PATH%\" && set CSC_IDENTITY_AUTO_DISCOVERY=false && npm run build && electron-builder --win nsis --publish never",
     "preview": "electron-vite preview",
     "typecheck": "tsc -b",
     "check": "npm run typecheck",
@@ -47,6 +48,7 @@
     "react-lazy-load-image-component": "^1.6.3",
     "react-player": "^3.4.0",
     "react-voice-visualizer": "^2.1.0",
+    "sharp": "^0.34.5",
     "unicode-emoji-json": "^0.9.0",
     "wavesurfer.js": "^7.12.7",
     "zustand": "^5.0.13"
@@ -61,6 +63,10 @@
       "out/**/*",
       "build/icon.ico",
       "package.json"
+    ],
+    "asarUnpack": [
+      "node_modules/sharp/**/*",
+      "node_modules/@img/**/*"
     ],
     "extraResources": [
       {
