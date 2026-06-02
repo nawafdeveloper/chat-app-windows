@@ -1,6 +1,6 @@
 {
   "name": "yahla-windows",
-  "version": "1.0.5",
+  "version": "1.0.11",
   "description": "YaHla Private messaging app with multi platforms.",
   "main": "out/main/index.js",
   "scripts": {
@@ -8,8 +8,13 @@
     "start": "electron-vite dev",
     "build": "npm run typecheck && electron-vite build",
     "dist": "npm run dist:win",
+    "generate:appx-assets": "node scripts/generate-appx-assets.cjs",
+    "predist:win": "npm run generate:appx-assets",
     "dist:win": "set \"PATH=C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;%PATH%\" && set CSC_IDENTITY_AUTO_DISCOVERY=false && npm run build && electron-builder --win appx nsis --publish never",
+    "dist:win:store": "npm run generate:appx-assets && set \"PATH=C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;%PATH%\" && set CSC_IDENTITY_AUTO_DISCOVERY=false && npm run build && electron-builder --win appx --publish never",
+    "dist:win:devsigned": "npm run dist:win && npm run sign:appx:dev",
     "dist:win:installer": "set \"PATH=C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;%PATH%\" && set CSC_IDENTITY_AUTO_DISCOVERY=false && npm run build && electron-builder --win nsis --publish never",
+    "sign:appx:dev": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/sign-appx-dev.ps1",
     "preview": "electron-vite preview",
     "typecheck": "tsc -b",
     "check": "npm run typecheck",
@@ -38,6 +43,7 @@
     "@emotion/styled": "^11.14.1",
     "@mui/icons-material": "^7.3.11",
     "@mui/material": "^7.3.11",
+    "@napi-rs/canvas": "^1.0.0",
     "better-auth": "^1.6.11",
     "framer-motion": "^12.40.0",
     "mui-one-time-password-input": "^7.0.0",
@@ -66,7 +72,8 @@
     ],
     "asarUnpack": [
       "node_modules/sharp/**/*",
-      "node_modules/@img/**/*"
+      "node_modules/@img/**/*",
+      "node_modules/@napi-rs/**/*"
     ],
     "extraResources": [
       {
@@ -105,7 +112,7 @@
       "identityName": "YaHla.YaHla",
       "publisher": "CN=E74A2C33-7C93-4629-AB33-D7CE624E0278",
       "applicationId": "YaHla",
-      "backgroundColor": "#ffffff",
+      "backgroundColor": "transparent",
       "minVersion": "10.0.17763.0",
       "maxVersionTested": "10.0.19041.0"
     }

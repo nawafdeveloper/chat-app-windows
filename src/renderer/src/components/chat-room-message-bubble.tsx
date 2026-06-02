@@ -854,15 +854,15 @@ export default function ChatRoomMessageBubble({
                                 borderTopRightRadius: isSender
                                     ? isFirstInGroup
                                         ? 0
-                                        : 7
-                                    : 7,
-                                borderBottomRightRadius: 7,
-                                borderBottomLeftRadius: 7,
+                                        : 10
+                                    : 10,
+                                borderBottomRightRadius: 10,
+                                borderBottomLeftRadius: 10,
                                 borderTopLeftRadius: isSender
-                                    ? 7
+                                    ? 10
                                     : isFirstInGroup
                                         ? 0
-                                        : 7,
+                                        : 10,
                                 position: "relative",
                                 overflow: "visible",
                                 boxShadow: "0px 2px 0px rgba(0,0,0,0.09)",
@@ -1345,7 +1345,7 @@ export default function ChatRoomMessageBubble({
                                     py:
                                         message.attached_media === "voice"
                                             ? "0px"
-                                            : "8px",
+                                            : "4px",
                                     paddingBottom:
                                         message.attached_media === "voice"
                                             ? "0px !important"
