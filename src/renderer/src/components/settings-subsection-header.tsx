@@ -33,7 +33,7 @@ export default function SettingsSubsectionHeader({ title }: Props) {
                         "&:hover": {
                             backgroundColor:
                                 theme.palette.mode === "dark"
-                                    ? "#333333"
+                                    ? "#353939"
                                     : "#e5e5e5",
                         },
                         display: { xs: "none", sm: "flex" }

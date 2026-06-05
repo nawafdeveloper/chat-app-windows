@@ -212,7 +212,7 @@ export default function LocaleSwitcher({ currentLocale }: LocaleSwitcherProps) {
                         borderRadius: '16px',
                         minWidth: '450px',
                         padding: '4px',
-                        backgroundColor: (theme) => theme.palette.mode === "dark" ? "#222424" : "#ffffff",
+                        backgroundColor: (theme) => theme.palette.mode === "dark" ? "#1d1f1f" : "#ffffff",
                         boxShadow: '0px 12px 30px rgba(0, 0, 0, 0.08)',
                     },
                 }}

@@ -57,11 +57,11 @@ export default function ChatRoomActionBubble({
                     pointerEvents: 'auto',
                     "&:hover": {
                         backgroundColor:
-                            theme.palette.mode === "dark" ? "#222424" : "#ffffff",
+                            theme.palette.mode === "dark" ? "#1d1f1f" : "#ffffff",
                     },
                     padding: 0,
                     backgroundColor:
-                        theme.palette.mode === "dark" ? "#222424" : "#ffffff",
+                        theme.palette.mode === "dark" ? "#1d1f1f" : "#ffffff",
                 })}
             >
                 <ExpandMore
@@ -78,7 +78,7 @@ export default function ChatRoomActionBubble({
                 onClose={handleClose}
                 PaperProps={{
                     sx: (theme) => ({
-                        backgroundColor: theme.palette.mode === "dark" ? "#222424" : "#ffffff",
+                        backgroundColor: theme.palette.mode === "dark" ? "#1d1f1f" : "#ffffff",
                         borderRadius: 3,
                         boxShadow: "0px 4px 20px rgba(0,0,0,0.1)",
                         width: '170px'
@@ -95,7 +95,7 @@ export default function ChatRoomActionBubble({
                     onClick={handleReply}
                     sx={(theme) => ({
                         "&:hover": {
-                            backgroundColor: theme.palette.mode === "dark" ? "#333" : "#eee",
+                            backgroundColor: theme.palette.mode === "dark" ? "#353939" : "#eee",
                         },
                         borderRadius: 2,
                         paddingY: 1,
@@ -124,7 +124,7 @@ export default function ChatRoomActionBubble({
                     onClick={handleForward}
                     sx={(theme) => ({
                         "&:hover": {
-                            backgroundColor: theme.palette.mode === "dark" ? "#333" : "#eee",
+                            backgroundColor: theme.palette.mode === "dark" ? "#353939" : "#eee",
                         },
                         borderRadius: 2,
                         paddingY: 1,
@@ -153,7 +153,7 @@ export default function ChatRoomActionBubble({
                     onClick={handlePin}
                     sx={(theme) => ({
                         "&:hover": {
-                            backgroundColor: theme.palette.mode === "dark" ? "#333" : "#eee",
+                            backgroundColor: theme.palette.mode === "dark" ? "#353939" : "#eee",
                         },
                         borderRadius: 2,
                         paddingY: 1,
@@ -182,7 +182,7 @@ export default function ChatRoomActionBubble({
                     onClick={handleStar}
                     sx={(theme) => ({
                         "&:hover": {
-                            backgroundColor: theme.palette.mode === "dark" ? "#333" : "#eee",
+                            backgroundColor: theme.palette.mode === "dark" ? "#353939" : "#eee",
                         },
                         borderRadius: 2,
                         paddingY: 1,

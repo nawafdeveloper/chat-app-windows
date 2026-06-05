@@ -47,11 +47,11 @@ export default function SmallSideBar({ activeNav, setActiveNav }: Props) {
                     <IconButton
                         onClick={() => handleSetActiveNav('chats', 'main-chat')}
                         sx={(theme) => ({
-                            backgroundColor: activeNav === 'chats' ? theme.palette.mode === "dark" ? "#333333" : "#EAE9E7" : "transparent",
+                            backgroundColor: activeNav === 'chats' ? theme.palette.mode === "dark" ? "#353939" : "#EAE9E7" : "transparent",
                             "&:hover": {
                                 backgroundColor:
                                     theme.palette.mode === "dark"
-                                        ? "#333333"
+                                        ? "#353939"
                                         : "#e5e5e5",
                             },
                         })}
@@ -97,11 +97,11 @@ export default function SmallSideBar({ activeNav, setActiveNav }: Props) {
                     <IconButton
                         onClick={() => handleSetActiveNav('archive', 'main-archive')}
                         sx={(theme) => ({
-                            backgroundColor: activeNav === 'archive' ? theme.palette.mode === "dark" ? "#333333" : "#EAE9E7" : "transparent",
+                            backgroundColor: activeNav === 'archive' ? theme.palette.mode === "dark" ? "#353939" : "#EAE9E7" : "transparent",
                             "&:hover": {
                                 backgroundColor:
                                     theme.palette.mode === "dark"
-                                        ? "#333333"
+                                        ? "#353939"
                                         : "#e5e5e5",
                             },
                         })}
@@ -137,11 +137,11 @@ export default function SmallSideBar({ activeNav, setActiveNav }: Props) {
                     <IconButton
                         onClick={() => handleSetActiveNav('settings', 'main-setting')}
                         sx={(theme) => ({
-                            backgroundColor: activeNav === 'settings' ? theme.palette.mode === "dark" ? "#333333" : "#EAE9E7" : "transparent",
+                            backgroundColor: activeNav === 'settings' ? theme.palette.mode === "dark" ? "#353939" : "#EAE9E7" : "transparent",
                             "&:hover": {
                                 backgroundColor:
                                     theme.palette.mode === "dark"
-                                        ? "#333333"
+                                        ? "#353939"
                                         : "#e5e5e5",
                             },
                         })}

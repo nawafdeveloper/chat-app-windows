@@ -35,7 +35,7 @@ type PreferenceKey =
 
 const menuItemSx = (theme: Theme) => ({
     "&:hover": {
-        backgroundColor: theme.palette.mode === "dark" ? "#333" : "#eee",
+        backgroundColor: theme.palette.mode === "dark" ? "#353939" : "#eee",
     },
     borderRadius: 2,
     paddingY: 1,
@@ -454,7 +454,7 @@ export default function ChatRoomMoreActionButton({ chat_type, chat_id }: Props) 
                         minWidth: { xs: "calc(100vw - 32px)", sm: "450px" },
                         padding: "4px",
                         backgroundColor: (theme) =>
-                            theme.palette.mode === "dark" ? "#222424" : "#ffffff",
+                            theme.palette.mode === "dark" ? "#1d1f1f" : "#ffffff",
                         boxShadow: "0px 12px 30px rgba(0, 0, 0, 0.08)",
                     },
                 }}
@@ -548,7 +548,7 @@ export default function ChatRoomMoreActionButton({ chat_type, chat_id }: Props) 
                         minWidth: { xs: "calc(100vw - 32px)", sm: "450px" },
                         padding: "4px",
                         backgroundColor: (theme) =>
-                            theme.palette.mode === "dark" ? "#222424" : "#ffffff",
+                            theme.palette.mode === "dark" ? "#1d1f1f" : "#ffffff",
                         boxShadow: "0px 12px 30px rgba(0, 0, 0, 0.08)",
                     },
                 }}

@@ -1016,7 +1016,7 @@ export default function DetailedLargeSidebarContent({
 
                         "&:hover": {
                             boxShadow: "0px 4px 20px rgba(0,0,0,0)",
-                            backgroundColor: theme.palette.mode === "dark" ? "#333" : "#eee",
+                            backgroundColor: theme.palette.mode === "dark" ? "#353939" : "#eee",
                         },
                     })}
                 >
@@ -1098,7 +1098,7 @@ export default function DetailedLargeSidebarContent({
 
                             "&:hover": {
                                 boxShadow: "0px 4px 20px rgba(0,0,0,0)",
-                                backgroundColor: theme.palette.mode === "dark" ? "#333" : "#eee",
+                                backgroundColor: theme.palette.mode === "dark" ? "#353939" : "#eee",
                             },
                             "& .MuiListItemText-secondary": {
                                 maxWidth: "100%",
@@ -1301,7 +1301,7 @@ export default function DetailedLargeSidebarContent({
 
                             "&:hover": {
                                 boxShadow: "0px 4px 20px rgba(0,0,0,0)",
-                                backgroundColor: theme.palette.mode === "dark" ? "#333" : "#eee",
+                                backgroundColor: theme.palette.mode === "dark" ? "#353939" : "#eee",
                             },
                             "& .MuiListItemText-secondary": {
                                 maxWidth: "100%",
@@ -1333,7 +1333,7 @@ export default function DetailedLargeSidebarContent({
                 onClose={handleMemberMenuClose}
                 PaperProps={{
                     sx: (theme) => ({
-                        backgroundColor: theme.palette.mode === "dark" ? "#222424" : "#ffffff",
+                        backgroundColor: theme.palette.mode === "dark" ? "#1d1f1f" : "#ffffff",
                         borderRadius: 3,
                         boxShadow: "0px 4px 20px rgba(0,0,0,0.1)",
                     }),
@@ -1357,7 +1357,7 @@ export default function DetailedLargeSidebarContent({
                             }
                             sx={(theme) => ({
                                 "&:hover": {
-                                    backgroundColor: theme.palette.mode === "dark" ? "#333" : "#eee",
+                                    backgroundColor: theme.palette.mode === "dark" ? "#353939" : "#eee",
                                 },
                                 borderRadius: 2,
                                 paddingY: 1,
@@ -1371,7 +1371,7 @@ export default function DetailedLargeSidebarContent({
                             onClick={() => void removeMember(activeMember)}
                             sx={(theme) => ({
                                 "&:hover": {
-                                    backgroundColor: theme.palette.mode === "dark" ? "#333" : "#eee",
+                                    backgroundColor: theme.palette.mode === "dark" ? "#353939" : "#eee",
                                 },
                                 color: "#fa99a4",
                                 borderRadius: 2,
@@ -1395,7 +1395,7 @@ export default function DetailedLargeSidebarContent({
                         minWidth: { xs: "calc(100vw - 32px)", sm: "450px" },
                         padding: "4px",
                         backgroundColor: (theme) =>
-                            theme.palette.mode === "dark" ? "#222424" : "#ffffff",
+                            theme.palette.mode === "dark" ? "#1d1f1f" : "#ffffff",
                         boxShadow: "0px 12px 30px rgba(0, 0, 0, 0.08)",
                     },
                 }}
@@ -1489,7 +1489,7 @@ export default function DetailedLargeSidebarContent({
                         minWidth: { xs: "calc(100vw - 32px)", sm: "450px" },
                         padding: "4px",
                         backgroundColor: (theme) =>
-                            theme.palette.mode === "dark" ? "#222424" : "#ffffff",
+                            theme.palette.mode === "dark" ? "#1d1f1f" : "#ffffff",
                         boxShadow: "0px 12px 30px rgba(0, 0, 0, 0.08)",
                     },
                 }}

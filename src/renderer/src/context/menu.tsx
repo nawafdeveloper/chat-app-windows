@@ -66,7 +66,7 @@ const ContextMenu: React.FC<ContextMenuProps> = ({ items, containerRef }) => {
                         }}
                         sx={(theme) => ({
                             "&:hover": {
-                                backgroundColor: theme.palette.mode === "dark" ? "#333" : "#eee",
+                                backgroundColor: theme.palette.mode === "dark" ? "#353939" : "#eee",
                             },
                             borderRadius: 2,
                             py: 1,

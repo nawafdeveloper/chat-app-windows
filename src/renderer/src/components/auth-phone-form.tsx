@@ -57,7 +57,7 @@ export default function AuthPhoneForm({
                 <div className='flex flex-col items-center justify-center gap-y-4 md:gap-y-8 w-full'>
                     <Image
                         src={locale === 'ar' ? "yahla-arabic-brand.svg" : "yahla-english-brand.svg"}
-                        alt="HalaBaak Corp.©"
+                        alt="YaHla Corp.©"
                         width={200}
                         height={200}
                         className="w-auto h-7 object-contain"

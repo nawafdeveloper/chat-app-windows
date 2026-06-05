@@ -35,7 +35,7 @@ export default function ChatsMoreButtonMenu({ logout }: Props) {
                         "&:hover": {
                             backgroundColor:
                                 theme.palette.mode === "dark"
-                                    ? "#333333"
+                                    ? "#353939"
                                     : "#e5e5e5",
                         },
                     })}

@@ -53,7 +53,7 @@ const appThemeColors = {
         background: "#161717",
         foreground: "#f7f5f3",
         surface: "#1d1f1f",
-        surfaceSoft: "#333333",
+        surfaceSoft: "#353939",
         foregroundMuted: "#a5a5a5",
         borderSubtle: "#2c2c2c",
         inverseSurface: "#ffffff",

@@ -1,6 +1,6 @@
 {
   "name": "yahla-windows",
-  "version": "1.0.11",
+  "version": "1.0.12",
   "description": "YaHla Private messaging app with multi platforms.",
   "main": "out/main/index.js",
   "scripts": {

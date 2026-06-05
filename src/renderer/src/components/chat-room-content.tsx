@@ -875,8 +875,9 @@ export default function ChatRoomContent() {
                 display: "flex",
                 overflow: "hidden",
                 backgroundImage: getWallpaper(theme.palette.mode),
-                backgroundRepeat: "repeat",
-                backgroundSize: "110px",
+                backgroundRepeat: "no-repeat",
+                backgroundSize: "cover",
+                backgroundPosition: "center",
                 backgroundColor: theme.palette.mode === "dark" ? "#161717" : "#f5f5f5",
             })}
         >
@@ -1041,7 +1042,7 @@ export default function ChatRoomContent() {
                         minWidth: { xs: "calc(100vw - 32px)", sm: "450px" },
                         padding: "4px",
                         backgroundColor: (theme) =>
-                            theme.palette.mode === "dark" ? "#222424" : "#ffffff",
+                            theme.palette.mode === "dark" ? "#1d1f1f" : "#ffffff",
                         boxShadow: "0px 12px 30px rgba(0, 0, 0, 0.08)",
                     },
                 }}

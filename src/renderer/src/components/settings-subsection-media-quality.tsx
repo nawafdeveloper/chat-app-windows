@@ -108,7 +108,7 @@ export default function SettingsSubsectionMediaQuality() {
 
                             "&:hover": {
                                 boxShadow: "0px 4px 20px rgba(0,0,0,0)",
-                                backgroundColor: theme.palette.mode === "dark" ? "#333" : "#eee",
+                                backgroundColor: theme.palette.mode === "dark" ? "#353939" : "#eee",
                                 "& .chat-badge": {
                                     transform: "translate(-28px, -50%)",
                                     opacity: 1,

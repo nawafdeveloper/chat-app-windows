@@ -39,10 +39,11 @@ export default function WallpaperPreview() {
                 width: "100%",
                 position: "relative",
                 display: "flex",
-                overflow: 'hidden',
+                overflow: "hidden",
                 backgroundImage: getWallpaper(theme.palette.mode),
-                backgroundRepeat: "repeat",
-                backgroundSize: "110px",
+                backgroundRepeat: "no-repeat",
+                backgroundSize: "cover",
+                backgroundPosition: "center",
             })}
         />
     )

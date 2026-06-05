@@ -50,7 +50,7 @@ export default function PinCode() {
                 <div className="flex w-full flex-col items-center justify-center gap-y-4 md:gap-y-8">
                     <Image
                         src={locale === 'ar' ? "yahla-arabic-brand.svg" : "yahla-english-brand.svg"}
-                        alt="HalaBaak Corp. (c)"
+                        alt="YaHla Corp. (c)"
                         width={200}
                         height={200}
                         className="h-7 w-auto object-contain"
